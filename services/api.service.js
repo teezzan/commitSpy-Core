@@ -1,6 +1,7 @@
 "use strict";
 
 const ApiGateway = require("moleculer-web");
+const _ = require('lodash')
 
 /**
  * @typedef {import('moleculer').Context} Context Moleculer's Context
@@ -38,10 +39,10 @@ module.exports = {
 				mergeParams: true,
 
 				// Enable authentication. Implement the logic into `authenticate` method. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Authentication
-				authentication: false,
+				authentication: true,
 
 				// Enable authorization. Implement the logic into `authorize` method. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Authorization
-				authorization: false,
+				authorization: true,
 
 				// The auto-alias feature allows you to declare your route alias directly in your services.
 				// The gateway will dynamically build the full routes from service schema.
@@ -51,14 +52,14 @@ module.exports = {
 
 				},
 
-				/** 
+				/**
 				 * Before call hook. You can check the request.
-				 * @param {Context} ctx 
-				 * @param {Object} route 
-				 * @param {IncomingRequest} req 
-				 * @param {ServerResponse} res 
+				 * @param {Context} ctx
+				 * @param {Object} route
+				 * @param {IncomingRequest} req
+				 * @param {ServerResponse} res
 				 * @param {Object} data
-				 * 
+				 *
 				onBeforeCall(ctx, route, req, res) {
 					// Set request headers to context meta
 					ctx.meta.userAgent = req.headers["user-agent"];
@@ -66,10 +67,10 @@ module.exports = {
 
 				/**
 				 * After call hook. You can modify the data.
-				 * @param {Context} ctx 
-				 * @param {Object} route 
-				 * @param {IncomingRequest} req 
-				 * @param {ServerResponse} res 
+				 * @param {Context} ctx
+				 * @param {Object} route
+				 * @param {IncomingRequest} req
+				 * @param {ServerResponse} res
 				 * @param {Object} data
 				onAfterCall(ctx, route, req, res, data) {
 					// Async function which return with Promise
@@ -131,26 +132,37 @@ module.exports = {
 		 */
 		async authenticate(ctx, route, req) {
 			// Read the token from header
-			const auth = req.headers["authorization"];
 
-			if (auth && auth.startsWith("Bearer")) {
-				const token = auth.slice(7);
 
-				// Check the token. Tip: call a service which verify the token. E.g. `accounts.resolveToken`
-				if (token == "123456") {
-					// Returns the resolved user. It will be set to the `ctx.meta.user`
-					return { id: 1, name: "John Doe" };
-
-				} else {
-					// Invalid token
-					throw new ApiGateway.Errors.UnAuthorizedError(ApiGateway.Errors.ERR_INVALID_TOKEN);
-				}
-
-			} else {
-				// No token. Throw an error or do nothing if anonymous access is allowed.
-				// throw new E.UnAuthorizedError(E.ERR_NO_TOKEN);
-				return null;
+			let token;
+			if (req.headers.authorization) {
+				let type = req.headers.authorization.split(" ")[0];
+				if (type === "Token" || type === "Bearer")
+					token = req.headers.authorization.split(" ")[1];
 			}
+
+			let user;
+			if (token) {
+				// Verify JWT token
+				try {
+					user = await ctx.call("users.resolveToken", { token });
+					if (user) {
+						this.logger.info("Authenticated via JWT: ", user.username);
+						// Reduce user fields (it will be transferred to other nodes)
+						ctx.meta.token = token;
+						ctx.meta.userID = user._id;
+
+						let sel = await _.pick(user, ["_id", "username", "email", "twitter"]);
+						ctx.meta.user1 = sel;
+						console.log("ctx   + ", ctx.meta);
+					}
+					// return ctx
+				} catch (err) {
+					console.log("errr")
+					return null;// Ignored because we continue processing if user doesn't exists
+				}
+			}
+
 		},
 
 		/**
@@ -165,7 +177,8 @@ module.exports = {
 		 */
 		async authorize(ctx, route, req) {
 			// Get the authenticated user.
-			const user = ctx.meta.user;
+			const user = ctx.meta.user1;
+			console.log("ctx2   + ", ctx.meta);
 
 			// It check the `auth` property in action schema.
 			if (req.$action.auth == "required" && !user) {

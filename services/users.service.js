@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 const DbService = require("moleculer-db");
 const MongooseAdapter = require("moleculer-db-adapter-mongoose");
 const User = require("../models/user.model");
-
+const crypto = require('crypto')
 // const CacheCleanerMixin = require("../mixins/cache.cleaner.mixin");
 
 module.exports = {
@@ -152,78 +152,79 @@ module.exports = {
 			}
 		},
 
-		// /**
-		//  * Get current user entity.
-		//  * Auth is required!
-		//  *
-		//  * @actions
-		//  *
-		//  * @returns {Object} User entity
-		//  */
-		// me: {
-		// 	auth: "required",
-		// 	rest: "GET /user",
-		// 	cache: {
-		// 		keys: ["#userID"]
-		// 	},
-		// 	async handler(ctx) {
-		// 		const user = await this.getById(ctx.meta.user._id);
-		// 		if (!user)
-		// 			throw new MoleculerClientError("User not found!", 400);
+		/**
+		 * Get current user entity.
+		 * Auth is required!
+		 *
+		 * @actions
+		 *
+		 * @returns {Object} User entity
+		 */
+		me: {
+			auth: "required",
+			rest: "GET /user",
+			// cache: {
+			// 	keys: ["#userID"]
+			// },
+			async handler(ctx) {
+				console.log(ctx)
+				const user = await this.getById(ctx.meta.user1._id);
+				if (!user)
+					throw new MoleculerClientError("User not found!", 400);
 
-		// 		const doc = await this.transformDocuments(ctx, {}, user);
-		// 		return await this.transformEntity(doc, true, ctx.meta.token);
-		// 	}
-		// },
+				const doc = await this.transformDocuments(ctx, {}, user);
+				return await this.transformEntity(doc, true, ctx.meta.token);
+			}
+		},
 
-		// /**
-		//  * Update current user entity.
-		//  * Auth is required!
-		//  *
-		//  * @actions
-		//  *
-		//  * @param {Object} user - Modified fields
-		//  * @returns {Object} User entity
-		//  */
-		// updateMyself: {
-		// 	auth: "required",
-		// 	rest: "PUT /user",
-		// 	params: {
-		// 		user: {
-		// 			type: "object", props: {
-		// 				username: { type: "string", min: 2, optional: true, pattern: /^[a-zA-Z0-9]+$/ },
-		// 				password: { type: "string", min: 6, optional: true },
-		// 				email: { type: "email", optional: true },
-		// 				bio: { type: "string", optional: true },
-		// 				image: { type: "string", optional: true },
-		// 			}
-		// 		}
-		// 	},
-		// 	async handler(ctx) {
-		// 		const newData = ctx.params.user;
-		// 		if (newData.username) {
-		// 			const found = await this.adapter.findOne({ username: newData.username });
-		// 			if (found && found._id.toString() !== ctx.meta.user._id.toString())
-		// 				throw new MoleculerClientError("Username is exist!", 422, "", [{ field: "username", message: "is exist" }]);
-		// 		}
+		/**
+		 * Update current user entity.
+		 * Auth is required!
+		 *
+		 * @actions
+		 *
+		 * @param {Object} user - Modified fields
+		 * @returns {Object} User entity
+		 */
+		updateMyself: {
+			auth: "required",
+			rest: "PUT /user",
+			params: {
+				user: {
+					type: "object", props: {
+						username: { type: "string", min: 2, optional: true, pattern: /^[a-zA-Z0-9]+$/ },
+						password: { type: "string", min: 6, optional: true },
+						email: { type: "email", optional: true },
+						avatar: { type: "string", optional: true },
+						twitter: { type: "string", optional: true },
+					}
+				}
+			},
+			async handler(ctx) {
+				const newData = ctx.params.user;
+				if (newData.username) {
+					const found = await this.adapter.findOne({ username: newData.username });
+					if (found && found._id.toString() !== ctx.meta.user1._id.toString())
+						throw new MoleculerClientError("Username is exist!", 422, "", [{ field: "username", message: "is exist" }]);
+				}
 
-		// 		if (newData.email) {
-		// 			const found = await this.adapter.findOne({ email: newData.email });
-		// 			if (found && found._id.toString() !== ctx.meta.user._id.toString())
-		// 				throw new MoleculerClientError("Email is exist!", 422, "", [{ field: "email", message: "is exist" }]);
-		// 		}
-		// 		newData.updatedAt = new Date();
-		// 		const update = {
-		// 			"$set": newData
-		// 		};
-		// 		const doc = await this.adapter.updateById(ctx.meta.user._id, update);
+				if (newData.email) {
+					const found = await this.adapter.findOne({ email: newData.email });
+					if (found && found._id.toString() !== ctx.meta.user1._id.toString())
+						throw new MoleculerClientError("Email is exist!", 422, "", [{ field: "email", message: "is exist" }]);
+				}
+				newData.updatedAt = new Date();
+				const update = {
+					"$set": newData
+				};
+				const doc = await this.adapter.updateById(ctx.meta.user1._id, update);
 
-		// 		const user = await this.transformDocuments(ctx, {}, doc);
-		// 		const json = await this.transformEntity(user, true, ctx.meta.token);
-		// 		await this.entityChanged("updated", json, ctx);
-		// 		return json;
-		// 	}
-		// },
+				const user = await this.transformDocuments(ctx, {}, doc);
+				const json = await this.transformEntity(user, true, ctx.meta.token);
+				await this.entityChanged("updated", json, ctx);
+				return json;
+			}
+		},
 
 		list: {
 			rest: "GET /users"
@@ -242,83 +243,32 @@ module.exports = {
 		},
 
 
-		/**
-		 * Get a user profile.
-		 *
-		 * @actions
-		 *
-		 * @param {String} username - Username
-		 * @returns {Object} User entity
-		 */
-		profile: {
-			cache: {
-				keys: ["#userID", "username"]
-			},
-			rest: "GET /profiles/:username",
-			params: {
-				username: { type: "string" }
-			},
-			async handler(ctx) {
-				const user = await this.adapter.findOne({ username: ctx.params.username });
-				if (!user)
-					throw new MoleculerClientError("User not found!", 404);
+		// /**
+		//  * Get a user profile.
+		//  *
+		//  * @actions
+		//  *
+		//  * @param {String} username - Username
+		//  * @returns {Object} User entity
+		//  */
+		// profile: {
+		// 	cache: {
+		// 		keys: ["#userID", "username"]
+		// 	},
+		// 	rest: "GET /profiles/:username",
+		// 	params: {
+		// 		username: { type: "string" }
+		// 	},
+		// 	async handler(ctx) {
+		// 		const user = await this.adapter.findOne({ username: ctx.params.username });
+		// 		if (!user)
+		// 			throw new MoleculerClientError("User not found!", 404);
 
-				const doc = await this.transformDocuments(ctx, {}, user);
-				return await this.transformProfile(ctx, doc, ctx.meta.user);
-			}
-		},
+		// 		const doc = await this.transformDocuments(ctx, {}, user);
+		// 		return await this.transformProfile(ctx, doc, ctx.meta.user);
+		// 	}
+		// }
 
-		/**
-		 * Follow a user
-		 * Auth is required!
-		 *
-		 * @actions
-		 *
-		 * @param {String} username - Followed username
-		 * @returns {Object} Current user entity
-		 */
-		follow: {
-			auth: "required",
-			rest: "POST /profiles/:username/follow",
-			params: {
-				username: { type: "string" }
-			},
-			async handler(ctx) {
-				const user = await this.adapter.findOne({ username: ctx.params.username });
-				if (!user)
-					throw new MoleculerClientError("User not found!", 404);
-
-				await ctx.call("follows.add", { user: ctx.meta.user._id.toString(), follow: user._id.toString() });
-				const doc = await this.transformDocuments(ctx, {}, user);
-				return await this.transformProfile(ctx, doc, ctx.meta.user);
-			}
-		},
-
-		/**
-		 * Unfollow a user
-		 * Auth is required!
-		 *
-		 * @actions
-		 *
-		 * @param {String} username - Unfollowed username
-		 * @returns {Object} Current user entity
-		 */
-		unfollow: {
-			auth: "required",
-			rest: "DELETE /profiles/:username/follow",
-			params: {
-				username: { type: "string" }
-			},
-			async handler(ctx) {
-				const user = await this.adapter.findOne({ username: ctx.params.username });
-				if (!user)
-					throw new MoleculerClientError("User not found!", 404);
-
-				await ctx.call("follows.delete", { user: ctx.meta.user._id.toString(), follow: user._id.toString() });
-				const doc = await this.transformDocuments(ctx, {}, user);
-				return await this.transformProfile(ctx, doc, ctx.meta.user);
-			}
-		}
 	},
 
 	/**
@@ -350,8 +300,8 @@ module.exports = {
 		 */
 		transformEntity(user, withToken, token) {
 			if (user) {
-				//user.image = user.image || "https://www.gravatar.com/avatar/" + crypto.createHash("md5").update(user.email).digest("hex") + "?d=robohash";
-				user.image = user.image || "";
+				user.avatar = user.avatar || "https://www.gravatar.com/avatar/" + crypto.createHash("md5").update(user.email).digest("hex") + "?d=robohash";
+
 				if (withToken)
 					user.token = token || this.generateJWT(user);
 			}
@@ -368,14 +318,8 @@ module.exports = {
 		 */
 		async transformProfile(ctx, user, loggedInUser) {
 			//user.image = user.image || "https://www.gravatar.com/avatar/" + crypto.createHash("md5").update(user.email).digest("hex") + "?d=robohash";
-			user.image = user.image || "https://static.productionready.io/images/smiley-cyrus.jpg";
+			user.avatar = user.avatar || "https://static.productionready.io/images/smiley-cyrus.jpg";
 
-			if (loggedInUser) {
-				const res = await ctx.call("follows.has", { user: loggedInUser._id.toString(), follow: user._id.toString() });
-				user.following = res;
-			} else {
-				user.following = false;
-			}
 
 			return { profile: user };
 		}

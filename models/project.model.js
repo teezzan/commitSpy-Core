@@ -10,10 +10,12 @@ let ProjectSchema = new Schema({
 		required: "Please fill in title"
 	},
 	setMinCommit: {
-		type: Number
+		type: Number,
+		"default": 15
 	},
-	maxDroughtTime: {
-		type: Number
+	maxTime: {
+		type: Number,
+		"default": 60 * 60 * 24 * 1000 * 7
 	},
 	author: {
 		type: Schema.Types.ObjectId,
@@ -21,15 +23,25 @@ let ProjectSchema = new Schema({
 		required: "Please fill in an author ID",
 	},
 	trigger: {
-		type: Date
+		type: Date,
+		"default": Date.now() + 60 * 60 * 24 * 1000 * 7
 	},
 	alarmType: {
-		type: Number
+		type: Number,
+		"default": 0
+	},
+	billing: {
+		type: Boolean,
+		"default": false
 	},
 	weeklyCommits: [{
 		week: Number,
 		year: Number,
 		totalCommit: Number
+	}],
+	commitBills: [{
+		amount: Number,
+		date: Date,
 	}],
 }, {
 	timestamps: true
