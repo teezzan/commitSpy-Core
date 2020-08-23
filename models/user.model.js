@@ -12,6 +12,10 @@ let UserSchema = new Schema({
 		required: "Please fill in a username",
 		trim: true
 	},
+	git_id: {
+		type: String,
+		unique: true
+	},
 	password: {
 		type: String,
 		required: "Please fill in a password"

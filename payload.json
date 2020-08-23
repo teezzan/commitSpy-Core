@@ -1,0 +1,98 @@
+{
+  "sender": {
+    "login": "teezzan",
+    "id": 25867172,
+    "node_id": "MDQ6VXNlcjI1ODY3MTcy",
+    "avatar_url": "https://avatars2.githubusercontent.com/u/25867172?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/teezzan",
+    "html_url": "https://github.com/teezzan",
+    "followers_url": "https://api.github.com/users/teezzan/followers",
+    "following_url": "https://api.github.com/users/teezzan/following{/other_user}",
+    "gists_url": "https://api.github.com/users/teezzan/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/teezzan/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/teezzan/subscriptions",
+    "organizations_url": "https://api.github.com/users/teezzan/orgs",
+    "repos_url": "https://api.github.com/users/teezzan/repos",
+    "events_url": "https://api.github.com/users/teezzan/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/teezzan/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "installation": {
+    "id": 11377094,
+    "node_id": "MDIzOkludGVncmF0aW9uSW5zdGFsbGF0aW9uMTEzNzcwOTQ="
+  },
+  "commits": [
+    {
+      "id": "75b5b3c479c1ce5c3ce6815fb0fe43908d751ed4",
+      "tree_id": "f38786368faef49df38c22a4c222c494534f1243",
+      "distinct": true,
+      "message": "added another 6",
+      "timestamp": "2020-08-22T16:14:49+01:00",
+      "url": "https://github.com/teezzan/dummyRepo/commit/75b5b3c479c1ce5c3ce6815fb0fe43908d751ed4",
+      "author": {
+        "name": "Taiwo Hassan Yusuf",
+        "email": "teehazzan@gmail.com",
+        "username": "teezzan"
+      },
+      "committer": {
+        "name": "Taiwo Hassan Yusuf",
+        "email": "teehazzan@gmail.com",
+        "username": "teezzan"
+      },
+      "added": [],
+      "removed": [],
+      "modified": ["test1.txt"]
+    },
+    {
+      "id": "62d0e4b605d1d50773aba05d2325af2adc8f8ed7",
+      "tree_id": "36de8d7866ae12e21cd4c4e4063d44a885f0429e",
+      "distinct": true,
+      "message": "added another 63",
+      "timestamp": "2020-08-22T16:15:16+01:00",
+      "url": "https://github.com/teezzan/dummyRepo/commit/62d0e4b605d1d50773aba05d2325af2adc8f8ed7",
+      "author": {
+        "name": "Taiwo Hassan Yusuf",
+        "email": "teehazzan@gmail.com",
+        "username": "teezzan"
+      },
+      "committer": {
+        "name": "Taiwo Hassan Yusuf",
+        "email": "teehazzan@gmail.com",
+        "username": "teezzan"
+      },
+      "added": [],
+      "removed": [],
+      "modified": ["test1.txt"]
+    },
+    {
+      "id": "850efddf4869d4b62a2dcffc3e5b746e1b0997a3",
+      "tree_id": "d8987b0e1160ee6500d7def46107ff39fdcf03cc",
+      "distinct": true,
+      "message": "added another 3",
+      "timestamp": "2020-08-22T16:15:29+01:00",
+      "url": "https://github.com/teezzan/dummyRepo/commit/850efddf4869d4b62a2dcffc3e5b746e1b0997a3",
+      "author": {
+        "name": "Taiwo Hassan Yusuf",
+        "email": "teehazzan@gmail.com",
+        "username": "teezzan"
+      },
+      "committer": {
+        "name": "Taiwo Hassan Yusuf",
+        "email": "teehazzan@gmail.com",
+        "username": "teezzan"
+      },
+      "added": [],
+      "removed": [],
+      "modified": ["test2.txt"]
+    }
+  ],
+  "repository": {
+    "id": 289352038,
+    "node_id": "MDEwOlJlcG9zaXRvcnkyODkzNTIwMzg=",
+    "name": "dummyRepo",
+    "full_name": "teezzan/dummyRepo",
+    "private": false
+  }
+}

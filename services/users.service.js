@@ -243,31 +243,28 @@ module.exports = {
 		},
 
 
-		// /**
-		//  * Get a user profile.
-		//  *
-		//  * @actions
-		//  *
-		//  * @param {String} username - Username
-		//  * @returns {Object} User entity
-		//  */
-		// profile: {
-		// 	cache: {
-		// 		keys: ["#userID", "username"]
-		// 	},
-		// 	rest: "GET /profiles/:username",
-		// 	params: {
-		// 		username: { type: "string" }
-		// 	},
-		// 	async handler(ctx) {
-		// 		const user = await this.adapter.findOne({ username: ctx.params.username });
-		// 		if (!user)
-		// 			throw new MoleculerClientError("User not found!", 404);
+		/**
+		 * Get a user profile.
+		 *
+		 * @actions
+		 *
+		 * @param {String} username - Username
+		 * @returns {Object} User entity
+		 */
+		getbygitID: {
 
-		// 		const doc = await this.transformDocuments(ctx, {}, user);
-		// 		return await this.transformProfile(ctx, doc, ctx.meta.user);
-		// 	}
-		// }
+			params: {
+				id: { type: "string" }
+			},
+			async handler(ctx) {
+				const user = await this.adapter.findOne({ git_id: ctx.params.id });
+				if (!user)
+					throw new MoleculerClientError("User not found!", 404);
+
+				const doc = await this.transformDocuments(ctx, {}, user);
+				return doc;
+			}
+		}
 
 	},
 
@@ -307,21 +304,6 @@ module.exports = {
 			}
 
 			return { user };
-		},
-
-		/**
-		 * Transform returned user entity as profile.
-		 *
-		 * @param {Context} ctx
-		 * @param {Object} user
-		 * @param {Object?} loggedInUser
-		 */
-		async transformProfile(ctx, user, loggedInUser) {
-			//user.image = user.image || "https://www.gravatar.com/avatar/" + crypto.createHash("md5").update(user.email).digest("hex") + "?d=robohash";
-			user.avatar = user.avatar || "https://static.productionready.io/images/smiley-cyrus.jpg";
-
-
-			return { profile: user };
 		}
 	}
 };

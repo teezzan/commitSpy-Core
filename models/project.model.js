@@ -9,6 +9,11 @@ let ProjectSchema = new Schema({
 		trim: true,
 		required: "Please fill in title"
 	},
+	git_id: {
+		type: String,
+		trim: true,
+		"default": "0"
+	},
 	setMinCommit: {
 		type: Number,
 		"default": 15

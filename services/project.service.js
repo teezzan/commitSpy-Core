@@ -99,59 +99,169 @@ module.exports = {
 		 */
 		updateProject: {
 			auth: "required",
-			rest: "PUT /user",
+			rest: "PUT /project",
 			params: {
-				user: {
+				project: {
 					type: "object", props: {
-						username: { type: "string", min: 2, optional: true, pattern: /^[a-zA-Z0-9]+$/ },
-						password: { type: "string", min: 6, optional: true },
-						email: { type: "email", optional: true },
-						avatar: { type: "string", optional: true },
-						twitter: { type: "string", optional: true },
+						_id: { type: "string", min: 2 },
+						title: { type: "string", min: 2, optional: true },
+						setMinCommit: { type: "number", optional: true },
+						maxTime: { type: "number", optional: true },
+						alarmType: { type: "number", optional: true },
+						billing: { type: "boolean", optional: true }
 					}
 				}
 			},
 			async handler(ctx) {
-				const newData = ctx.params.user;
-				if (newData.username) {
-					const found = await this.adapter.findOne({ username: newData.username });
-					if (found && found._id.toString() !== ctx.meta.user1._id.toString())
-						throw new MoleculerClientError("Username is exist!", 422, "", [{ field: "username", message: "is exist" }]);
-				}
+				const newData = ctx.params.project;
+				const repo = await this.adapter.findOne({ _id: newData._id });
 
-				if (newData.email) {
-					const found = await this.adapter.findOne({ email: newData.email });
-					if (found && found._id.toString() !== ctx.meta.user1._id.toString())
-						throw new MoleculerClientError("Email is exist!", 422, "", [{ field: "email", message: "is exist" }]);
-				}
-				newData.updatedAt = new Date();
-				const update = {
-					"$set": newData
-				};
-				const doc = await this.adapter.updateById(ctx.meta.user1._id, update);
+				if (repo && repo.author.toString() !== ctx.meta.user1._id.toString())
+					throw new MoleculerClientError("UnAuthorized", 422, "", [{ field: "Auth", message: "failed" }]);
 
-				const user = await this.transformDocuments(ctx, {}, doc);
-				const json = await this.transformEntity(user, true, ctx.meta.token);
-				await this.entityChanged("updated", json, ctx);
-				return json;
+				if (repo) {
+
+					if (newData.title) {
+						const found = await this.adapter.findOne({ title: newData.title });
+						if (found)
+							throw new MoleculerClientError("Repo exist!", 422, "", [{ field: "title", message: " exist" }]);
+					}
+
+					newData.updatedAt = new Date();
+					//check new data values
+					if (newData.alarmType && newData.alarmType > 2) {
+						newData.alarmType = 0
+					}
+					if (newData.maxTime && newData.maxTime < 0) {
+						throw new MoleculerClientError("Error!", 422, "", [{ field: "maxTime", message: " should be positive" }]);
+
+					}
+					if (newData.setMinCommit && newData.setMinCommit < 0) {
+						throw new MoleculerClientError("Error!", 422, "", [{ field: "setMinCommit", message: " should be positive" }]);
+
+					}
+					if (newData.author) {
+						throw new MoleculerClientError("Error!", 422, "", [{ field: "author", message: " unchangable" }]);
+					}
+					if (newData.billing && typeof (newData.billing) !== 'boolean') {
+						throw new MoleculerClientError("Error!", 422, "", [{ field: "billing", message: " not boolean" }]);
+
+					}
+					if (newData.weeklyCommits || newData.commitBills) {
+						throw new MoleculerClientError("Error!", 422, "", [{ field: "UnAuthorized", message: " UnAuthorized changes" }]);
+
+					}
+
+					const update = {
+						"$set": newData
+					};
+					const doc = await this.adapter.updateById(newData._id, update);
+
+					const project = await this.transformDocuments(ctx, {}, doc);
+					const json = await this.transformEntity(project);
+					await this.entityChanged("updated", json, ctx);
+					return json;
+				}
+				else {
+					throw new MoleculerClientError("Repo not found!", 422, "", [{ field: "_id", message: " does not exist" }]);
+				}
 			}
 		},
+		getUserProject: {
+			auth: "required",
+			rest: "GET /project",
 
+			async handler(ctx) {
+				try {
+					// console.log(ctx.meta.user1)filters = { author: ctx.meta.user1._id }
+					const doc = await this.adapter.find({ query: { author: ctx.meta.user1._id } });
+					console.log(doc)
+					const project = await this.transformDocuments(ctx, {}, doc);
+					const json = await this.transformEntity(project);
+					await this.entityChanged("found", json, ctx);
+					return json;
+				}
+				catch (err) {
+					console.log(err)
+					throw new MoleculerClientError("invalid ID!", 422, "", [{ field: "_id", message: " does not exist" }]);
+
+				}
+			}
+		},
+		updateProjectCommit: {
+			rest: "POST /hook",
+			params: {
+				githook: { type: "object" }
+			},
+			async handler(ctx) {
+				let entity = ctx.params.githook;
+				try {
+					let user = await ctx.call("users.getbygitID", { id: String(entity.sender.id) });
+					if (user) {
+						let doc = await this.adapter.find({ query: { author: user._id, git_id: String(entity.repository.id) } });
+						doc = doc[0];
+						if (doc) {
+							let no_commit = 0
+							for (let i = 0; i < entity.commits.length; i++) {
+								if (entity.commits[i].author.username == entity.sender.login) {
+									no_commit = no_commit + 1;
+								}
+							}
+							var wkyr = this.getWeekyear();
+							let cursor = doc.weeklyCommits.findIndex(x => x.week == wkyr.week && x.year == wkyr.year)
+							if (cursor == -1) {
+								//create
+								let temp = { week: wkyr.week, year: wkyr.year, totalCommit: no_commit }
+								doc.weeklyCommits.push(temp);
+							} else {
+								doc.weeklyCommits[cursor].totalCommit = doc.weeklyCommits[cursor].totalCommit + no_commit;
+							}
+							doc.updatedAt = new Date();
+							let update = {
+								"$set": doc
+							};
+							let docc = await this.adapter.updateById(doc._id, update);
+							if (docc) {
+								console.log("success ", docc);
+							}
+							return docc
+
+						} else {
+							throw new MoleculerClientError("invalid project", 422, "", [{ field: "project", message: " does not exist" }]);
+
+						}
+
+					} else {
+						throw new MoleculerClientError("invalid User", 422, "", [{ field: "user", message: " does not exist" }]);
+
+					}
+				}
+				catch (err) {
+					console.log(err)
+					throw new MoleculerClientError("invalid ID!", 422, "", [{ field: "_id", message: " does not exist" }]);
+
+				}
+			}
+		},
 		list: {
-			rest: "GET /projects"
+			rest: "GET /projects",
+			auth: "required"
 		},
 
 		get: {
-			rest: "GET /projects/:id"
+			rest: "GET /projects/:id",
+			auth: "required"
 		},
 
-		update: {
-			rest: "PUT /projects/:id"
-		},
+		// update: {
+		// 	rest: "PUT /projects/:id",
+		// 	auth: "required"
+		// },
 
-		remove: {
-			rest: "DELETE /projects/:id"
-		},
+		// remove: {
+		// 	rest: "DELETE /projects/:id",
+		// 	auth: "required"
+		// },
 
 
 	},
@@ -168,12 +278,6 @@ module.exports = {
 		 * @param {Object} project
 		 */
 		transformEntity(project) {
-			// if (user) {
-			// 	user.avatar = user.avatar || "https://www.gravatar.com/avatar/" + crypto.createHash("md5").update(user.email).digest("hex") + "?d=robohash";
-
-			// 	if (withToken)
-			// 		user.token = token || this.generateJWT(user);
-			// }
 
 			return { project };
 		},
@@ -186,11 +290,49 @@ module.exports = {
 		 * @param {Object?} loggedInUser
 		 */
 		async transformProfile(ctx, project) {
-			//user.image = user.image || "https://www.gravatar.com/avatar/" + crypto.createHash("md5").update(user.email).digest("hex") + "?d=robohash";
-			// user.avatar = user.avatar || "https://static.productionready.io/images/smiley-cyrus.jpg";
-
 
 			return { project: project };
+		},
+		/**
+		 * Returns the week number for this date.  dowOffset is the day of week the week
+		 * "starts" on for your locale - it can be from 0 to 6. If dowOffset is 1 (Monday),
+		 * the week returned is the ISO 8601 week number.
+		 * @param int dowOffset
+		 * @return int
+		 */
+		getWeekyear() {
+			Date.prototype.getWeek = function (dowOffset) {
+				/*getWeek() was developed by Nick Baicoianu at MeanFreePath: http://www.meanfreepath.com */
+
+				dowOffset = typeof (dowOffset) == 'int' ? dowOffset : 0; //default dowOffset to zero
+				var newYear = new Date(this.getFullYear(), 0, 1);
+				var day = newYear.getDay() - dowOffset; //the day of week the year begins on
+				day = (day >= 0 ? day : day + 7);
+				var daynum = Math.floor((this.getTime() - newYear.getTime() -
+					(this.getTimezoneOffset() - newYear.getTimezoneOffset()) * 60000) / 86400000) + 1;
+				var weeknum;
+				//if the year starts before the middle of a week
+				if (day < 4) {
+					weeknum = Math.floor((daynum + day - 1) / 7) + 1;
+					if (weeknum > 52) {
+						nYear = new Date(this.getFullYear() + 1, 0, 1);
+						nday = nYear.getDay() - dowOffset;
+						nday = nday >= 0 ? nday : nday + 7;
+						/*if the next year starts before the middle of
+						  the week, it is week #1 of that year*/
+						weeknum = nday < 4 ? 1 : 53;
+					}
+				}
+				else {
+					weeknum = Math.floor((daynum + day - 1) / 7);
+				}
+				return weeknum;
+			}
+			var out = {};
+			var mydate = new Date();
+			out.week = mydate.getWeek()
+			out.year = mydate.getFullYear()
+			return out;
 		}
 	}
 };

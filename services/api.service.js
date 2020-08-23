@@ -154,7 +154,7 @@ module.exports = {
 
 						let sel = await _.pick(user, ["_id", "username", "email", "twitter"]);
 						ctx.meta.user1 = sel;
-						console.log("ctx   + ", ctx.meta);
+						// console.log("ctx   + ", ctx.meta);
 					}
 					// return ctx
 				} catch (err) {
@@ -178,7 +178,7 @@ module.exports = {
 		async authorize(ctx, route, req) {
 			// Get the authenticated user.
 			const user = ctx.meta.user1;
-			console.log("ctx2   + ", ctx.meta);
+			// console.log("ctx2   + ", ctx.meta);
 
 			// It check the `auth` property in action schema.
 			if (req.$action.auth == "required" && !user) {
