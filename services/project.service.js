@@ -214,9 +214,21 @@ module.exports = {
 								//create
 								let temp = { week: wkyr.week, year: wkyr.year, totalCommit: no_commit }
 								doc.weeklyCommits.push(temp);
+								if (no_commit >= doc.setMinCommit) {
+									//move the alarm and send notification
+									console.log("here1");
+									doc.trigger = new Date(doc.trigger).getTime() + doc.maxTime;
+								}
 							} else {
+								let prevreading = doc.weeklyCommits[cursor].totalCommit;
 								doc.weeklyCommits[cursor].totalCommit = doc.weeklyCommits[cursor].totalCommit + no_commit;
+								if (doc.weeklyCommits[cursor].totalCommit >= doc.setMinCommit && prevreading < doc.setMinCommit) {
+									//move the alarm and send notification
+									console.log("here2");
+									doc.trigger = new Date(doc.trigger).getTime() + doc.maxTime;
+								}
 							}
+							//"trigger": "2020-08-29T20:59:55.029Z",
 							doc.updatedAt = new Date();
 							let update = {
 								"$set": doc
@@ -224,6 +236,7 @@ module.exports = {
 							let docc = await this.adapter.updateById(doc._id, update);
 							if (docc) {
 								console.log("success ", docc);
+								//cleanup
 							}
 							return docc
 
