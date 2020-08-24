@@ -28,11 +28,12 @@ module.exports = {
 		JWT_SECRET: process.env.JWT_SECRET || "jwt-conduit-secret",
 
 		/** Public fields */
-		fields: ["_id", "username", "email", "twitter", "avatar"],
+		fields: ["_id", "username", "git_id", "email", "twitter", "avatar"],
 
 		/** Validator schema for entity */
 		entityValidator: {
 			username: { type: "string", min: 2 },
+			git_id: { type: "string", min: 2 },
 			password: { type: "string", min: 6 },
 			email: { type: "email" },
 			avatar: { type: "string", optional: true },

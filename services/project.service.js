@@ -23,11 +23,12 @@ module.exports = {
 		rest: "/",
 
 		/** Public fields */
-		fields: ["_id", "title", "setMinCommit", "maxTime", "author", "trigger", "alarmType", "weeklyCommits", "billing"],
+		fields: ["_id", "title", "git_id", "setMinCommit", "maxTime", "author", "trigger", "alarmType", "weeklyCommits", "billing"],
 
 		/** Validator schema for entity */
 		entityValidator: {
 			title: { type: "string", min: 2 },
+			git_id: { type: "string", min: 2 },
 			setMinCommit: { type: "number", optional: true },
 			maxTime: { type: "number", optional: true },
 			author: { type: "string", optional: true },
