@@ -38,7 +38,16 @@ module.exports = {
 			weeklyCommits: { type: "array", optional: true },
 			commitBills: { type: "array", optional: true },
 
-		}
+		},
+
+		populates: {
+			"author": {
+				action: "users.get",
+				params: {
+					fields: ["username", "email", "twitter"]
+				}
+			}
+		},
 	},
 
 	/**
@@ -265,6 +274,47 @@ module.exports = {
 		get: {
 			rest: "GET /projects/:id",
 			auth: "required"
+		},
+		projectScheduler: {
+			rest: "GET /check",
+
+			async handler(ctx) {
+				try {
+					// let dueprojects = await this.adapter.find({ query: { trigger: { $lt: Date.now() } }, populate: ["author"] });
+					let dueprojects = await ctx.call("project.find", { query: { trigger: { $lt: Date.now() } }, populate: ["author"] })
+					let notify = [];
+					let billnotify = [];
+					if (dueprojects.length !== 0) {
+						for (let i = 0; i < dueprojects.length; i++) {
+							let proj = dueprojects[i];
+							var wkyr = this.getWeekyear();
+							let cursor = proj.weeklyCommits.findIndex(x => x.week == wkyr.week && x.year == wkyr.year);
+							let temp_payload = {
+								author: proj.author,
+								alarmType: proj.alarmType,
+								_id: proj._id,
+								maxTime: proj.maxTime,
+								setMinCommit: proj.setMinCommit,
+								title: proj.title,
+								weekCommits: cursor >= 0 ? proj.weeklyCommits[cursor].totalCommit : 0
+							}
+							if (proj.billing) {
+								billnotify.push(temp_payload)
+							} else {
+								notify.push(temp_payload)
+							}
+						}
+						//send to notification service. print here
+					}
+					return { notify, billnotify }
+
+				}
+				catch (err) {
+					console.log(err)
+					throw new MoleculerClientError("Scheduler Error!", 422, "", [{ field: "Failure", message: " dInternal Failure" }]);
+
+				}
+			}
 		},
 
 		// update: {
