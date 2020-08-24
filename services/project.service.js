@@ -275,8 +275,8 @@ module.exports = {
 			rest: "GET /projects/:id",
 			auth: "required"
 		},
-		projectScheduler: {
-			rest: "GET /check",
+		projectAlert: {
+			rest: "GET /checkalert",
 
 			async handler(ctx) {
 				try {
@@ -307,6 +307,43 @@ module.exports = {
 						//send to notification service. print here
 					}
 					return { notify, billnotify }
+
+				}
+				catch (err) {
+					console.log(err)
+					throw new MoleculerClientError("Scheduler Error!", 422, "", [{ field: "Failure", message: " dInternal Failure" }]);
+
+				}
+			}
+		},
+		projectWarning: {
+			rest: "GET /checkwarn",
+
+			async handler(ctx) {
+				try {
+					let dueprojects = await ctx.call("project.find", { query: { trigger: { $lt: Date.now() + (60 * 60 * 24 * 1000), $gt: Date.now() } }, populate: ["author"] })
+					let notify = [];
+					if (dueprojects.length !== 0) {
+						for (let i = 0; i < dueprojects.length; i++) {
+							let proj = dueprojects[i];
+							var wkyr = this.getWeekyear();
+							let cursor = proj.weeklyCommits.findIndex(x => x.week == wkyr.week && x.year == wkyr.year);
+							let temp_payload = {
+								author: proj.author,
+								alarmType: proj.alarmType,
+								_id: proj._id,
+								trigger: proj.trigger,
+								setMinCommit: proj.setMinCommit,
+								title: proj.title,
+								weekCommits: cursor >= 0 ? proj.weeklyCommits[cursor].totalCommit : 0
+							}
+							notify.push(temp_payload)
+
+						}
+						//send to warning notification service. print here
+						console.log(notify)
+					}
+					return { notify }
 
 				}
 				catch (err) {
