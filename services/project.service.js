@@ -341,7 +341,9 @@ module.exports = {
 
 						}
 						//send to warning notification service. print here
-						console.log(notify)
+						// console.log(notify)
+						let notification = await ctx.call("notification.sendWarning", { projects: notify });
+						return notification
 					}
 					return { notify }
 
