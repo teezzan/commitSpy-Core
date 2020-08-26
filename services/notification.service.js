@@ -3,7 +3,7 @@
 const { MoleculerClientError } = require("moleculer").Errors;
 // const CacheCleanerMixin = require("../mixins/cache.cleaner.mixin");
 const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey("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");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 module.exports = {
 	name: "notification",
 	mixins: [
