@@ -242,7 +242,8 @@ module.exports = {
 			}
 		},
 		list: {
-			rest: "GET /users"
+			rest: "GET /users",
+			auth: "required"
 		},
 
 		get: {
@@ -250,11 +251,12 @@ module.exports = {
 		},
 
 		update: {
-			rest: "PUT /users/:id"
+			rest: "PUT /users/:id",
+			auth: "required"
 		},
 
 		remove: {
-			rest: "DELETE /users/:id"
+			// rest: "DELETE /users/:id"
 		},
 
 

@@ -20,7 +20,7 @@ module.exports = {
 	 */
 	settings: {
 		/** REST Basepath */
-		rest: "/",
+		rest: "/project",
 
 		/** Public fields */
 		fields: ["_id", "title", "git_id", "setMinCommit", "maxTime", "author", "trigger", "alarmType", "weeklyCommits", "billing"],
@@ -64,7 +64,7 @@ module.exports = {
 		 */
 		create: {
 			auth: "required",
-			rest: "POST /project",
+			rest: "POST /",
 			params: {
 				project: { type: "object" }
 			},
@@ -109,7 +109,7 @@ module.exports = {
 		 */
 		updateProject: {
 			auth: "required",
-			rest: "PUT /project",
+			rest: "PUT /",
 			params: {
 				project: {
 					type: "object", props: {
@@ -179,7 +179,7 @@ module.exports = {
 		},
 		getUserProject: {
 			auth: "required",
-			rest: "GET /project",
+			rest: "GET /userprojects",
 
 			async handler(ctx) {
 				try {
@@ -388,23 +388,7 @@ module.exports = {
 				}
 			}
 		},
-		test: {
-			rest: "GET /test",
 
-			async handler(ctx) {
-				try {
-
-					let user = await ctx.call("users.deductWallet", { payload: { _id: "5f41c30f5889a175f8e7fdea", cost: 10 } });
-					console.log(user);
-					return user
-				}
-				catch (err) {
-					console.log(err)
-					throw new MoleculerClientError("Scheduler Error!", 422, "", [{ field: "Failure", message: " dInternal Failure" }]);
-
-				}
-			}
-		},
 
 		// update: {
 		// 	rest: "PUT /projects/:id",

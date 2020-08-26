@@ -12,13 +12,27 @@ module.exports = {
 	],
 	adapter: new MongooseAdapter(/*process.env.MONGO_URI ||*/"mongodb://localhost:27017/msv", { useNewUrlParser: true, useUnifiedTopology: true }),
 	model: Account,
+	async started() {
+
+		try {
+			let account = await this.adapter.findOne({ name: 'Main' });
+			if (account) {
+				console.log("Exists. Starting Up Normally");
+			} else {
+				account = await this.adapter.insert({ name: "Main" });
+			}
+		} catch (err) {
+			console.log(err)
+		}
+	},
+
 
 	/**
 	 * Default settings
 	 */
 	settings: {
 		/** REST Basepath */
-		rest: "/",
+		rest: "/payment",
 
 		// /** Public fields */
 		// fields: ["_id", "title", "git_id", "setMinCommit", "maxTime", "author", "trigger", "alarmType", "weeklyCommits", "billing"],
@@ -49,7 +63,7 @@ module.exports = {
 
 				try {
 					console.log("sending paid alert");
-					const account = await this.adapter.findOne({ title: 'Main' });
+					const account = await this.adapter.findOne({ name: 'Main' });
 
 					let entity = ctx.params.projects;
 					for (let i = 0; i < entity.length; i++) {
@@ -99,22 +113,37 @@ module.exports = {
 				}
 			}
 		},
-		afterConnected: {
+		test: {
+			rest: "GET /test",
+
 			async handler(ctx) {
-				console.log("after")
 				try {
-					const account = await this.adapter.findOne({ title: 'Main' });
-					if (account) {
-						console.log("Exists. Starting Up Normally");
-					} else {
-						account = await this.adapter.insert({ name: "Main" });
-					}
-				} catch (err) {
+					const account = await this.adapter.findOne({ name: 'Main' });
+					let updated = await this.adapter.updateById(account._id, {
+						$set: {
+							updatedAt: new Date()
+						},
+						$push: {
+							egress: {
+								amount: 1,
+								date: new Date(),
+								author: "5f41c30f5889a175f8e7fdea"
+							}
+						},
+						$inc: {
+							totalEgress: 1
+						}
+					});
+					console.log(updated)
+					return updated
+				}
+				catch (err) {
 					console.log(err)
+					throw new MoleculerClientError("Scheduler Error!", 422, "", [{ field: "Failure", message: " dInternal Failure" }]);
+
 				}
 			}
-
-		}
+		},
 	},
 
 	/**

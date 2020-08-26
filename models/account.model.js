@@ -7,7 +7,8 @@ let AccountSchema = new Schema({
 	name: {
 		type: String,
 		trim: true,
-		required: "Please fill in title"
+		required: "Please fill in title",
+		unique: true
 	},
 	uniy: {
 		type: String,
