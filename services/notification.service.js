@@ -56,7 +56,7 @@ module.exports = {
 							//so-so and so will be glad for your donations in Tweets.
 						}
 						//compose mail
-						let html = await this.composeMailPaid({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
+						let html = await this.composeMailPaid({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits, title: project.title })
 						let msg = {
 							to: `${project.author.email}`,
 							from: 'taiwo@skrypt.com.ng',
@@ -68,14 +68,15 @@ module.exports = {
 
 					}
 					// console.log(mailpayload);
-					sgMail.send(mailpayload).then(res => {
-						console.log("Success  sending Paid alert=>")
-						// console.log(res)
-						//call action to deduct money and move to another account where we then split and distribute accordingly
-						//call action to clear trigger
-						let clear = await ctx.call("project.clearAlert", { projects: entity });
-						return { status: "successs", mailpayload }
-					})
+					sgMail.send(mailpayload)
+						.then(res => {
+							console.log("Success  sending Paid alert=>")
+							// console.log(res)
+							//call action to deduct money and move to another account where we then split and distribute accordingly
+							//call action to clear trigger
+							let clear = ctx.call("project.clearAlert", { projects: entity });
+							return { status: "successs", mailpayload }
+						})
 						.catch(err => {
 							console.log("error")
 							console.log(err.response.body.errors)
@@ -107,7 +108,7 @@ module.exports = {
 							//so-so and so will be glad for your donations in Tweets.
 						}
 						//compose mail
-						let html = await this.composeMailUnPaid({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
+						let html = await this.composeMailUnPaid({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits, title: project.title })
 						let msg = {
 							to: `${project.author.email}`,
 							from: 'taiwo@skrypt.com.ng',
@@ -124,7 +125,7 @@ module.exports = {
 						// console.log(res)
 						//call action to deduct money and move to another account where we then split and distribute accordingly
 						//call action to clear trigger
-						let clear = await ctx.call("project.clearAlert", { projects: entity });
+						let clear = ctx.call("project.clearAlert", { projects: entity });
 						return { status: "successs", mailpayload }
 					})
 						.catch(err => {

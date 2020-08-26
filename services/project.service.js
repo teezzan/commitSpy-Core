@@ -305,9 +305,9 @@ module.exports = {
 							}
 						}
 						//send to notification service. print here
-						// let unpaidnotification = await ctx.call("notification.sendPaidAlert", { projects: billnotify });
+						let paidnotification = await ctx.call("notification.sendPaidAlert", { projects: billnotify });
 						//call payment service.
-						let paidnotification = await ctx.call("notification.sendAlert", { projects: notify });
+						let unpaidnotification = await ctx.call("notification.sendAlert", { projects: notify });
 						// return notification
 					}
 					return { notify, billnotify }
@@ -369,12 +369,12 @@ module.exports = {
 					for (let i = 0; i < entity.length; i++) {
 						let project = entity[i];
 						console.log(project.title)
-						// let updated = await adapter.updateById(project._id, {
-						// 	$set: {
-						// 		trigger: Date.now() + project.maxTime,
-						// 		updatedAt: new Date()
-						// 	}
-						// })
+						let updated = await this.adapter.updateById(project._id, {
+							$set: {
+								trigger: Date.now() + project.maxTime,
+								updatedAt: new Date()
+							}
+						})
 
 					}
 					console.log("Alert Cleared")
