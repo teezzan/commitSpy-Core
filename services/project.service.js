@@ -44,7 +44,7 @@ module.exports = {
 			"author": {
 				action: "users.get",
 				params: {
-					fields: ["username", "email", "twitter"]
+					fields: ["_id", "username", "email", "twitter"]
 				}
 			}
 		},
@@ -280,7 +280,6 @@ module.exports = {
 
 			async handler(ctx) {
 				try {
-					// let dueprojects = await this.adapter.find({ query: { trigger: { $lt: Date.now() } }, populate: ["author"] });
 					let dueprojects = await ctx.call("project.find", { query: { trigger: { $lt: Date.now() } }, populate: ["author"] })
 					let notify = [];
 					let billnotify = [];
@@ -373,7 +372,7 @@ module.exports = {
 							$set: {
 								trigger: Date.now() + project.maxTime,
 								updatedAt: new Date()
-							}
+							}//add the amount...
 						})
 
 					}
@@ -385,6 +384,23 @@ module.exports = {
 				catch (err) {
 					console.log(err)
 					throw new MoleculerClientError("Scheduler Error!", 422, "", [{ field: "Failure", message: " Update Failure" }]);
+
+				}
+			}
+		},
+		test: {
+			rest: "GET /test",
+
+			async handler(ctx) {
+				try {
+
+					let user = await ctx.call("users.deductWallet", { payload: { _id: "5f41c30f5889a175f8e7fdea", cost: 10 } });
+					console.log(user);
+					return user
+				}
+				catch (err) {
+					console.log(err)
+					throw new MoleculerClientError("Scheduler Error!", 422, "", [{ field: "Failure", message: " dInternal Failure" }]);
 
 				}
 			}

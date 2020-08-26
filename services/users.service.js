@@ -226,7 +226,21 @@ module.exports = {
 				return json;
 			}
 		},
-
+		deductWallet: {
+			params: {
+				payload: { type: "object" }
+			},
+			async handler(ctx) {
+				try {
+					const payload = ctx.params.payload;
+					let user = this.adapter.updateById(payload._id, { $inc: { wallet: -payload.cost } });
+					return user
+				} catch (err) {
+					console.log(err);
+					throw new MoleculerClientError("Internal Error!", 500, "", [{ field: "Failure", message: " Internal Failure" }]);
+				}
+			}
+		},
 		list: {
 			rest: "GET /users"
 		},
