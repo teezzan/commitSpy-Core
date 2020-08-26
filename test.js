@@ -8,11 +8,11 @@ const msg = {
 	text: 'and easy to do anywhere, even with Node.js',
 	html: '<strong>and easy to do anywhere, even with Node.js</strong>',
 };
-sgMail.send(msg).then(res => {
-	console.log("res =>")
-	console.log(res)
-})
-	.catch(err => {
-		console.log("error")
-		console.log(err.response.body.errors)
-	})
+// sgMail.send(msg).then(res => {
+// 	console.log("res =>")
+// 	console.log(res)
+// })
+// 	.catch(err => {
+// 		console.log("error")
+// 		console.log(err.response.body.errors)
+// 	})

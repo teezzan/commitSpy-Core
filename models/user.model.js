@@ -42,6 +42,10 @@ let UserSchema = new Schema({
 	},
 	avatar: {
 		type: String
+	},
+	wallet: {
+		type: Number,
+		"default": 0.00
 	}
 }, {
 	timestamps: true

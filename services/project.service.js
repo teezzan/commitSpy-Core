@@ -305,6 +305,10 @@ module.exports = {
 							}
 						}
 						//send to notification service. print here
+						// let unpaidnotification = await ctx.call("notification.sendPaidAlert", { projects: billnotify });
+						//call payment service.
+						let paidnotification = await ctx.call("notification.sendAlert", { projects: notify });
+						// return notification
 					}
 					return { notify, billnotify }
 
@@ -351,6 +355,36 @@ module.exports = {
 				catch (err) {
 					console.log(err)
 					throw new MoleculerClientError("Scheduler Error!", 422, "", [{ field: "Failure", message: " dInternal Failure" }]);
+
+				}
+			}
+		},
+		clearAlert: {
+			params: {
+				projects: { type: "array" }
+			},
+			async handler(ctx) {
+				try {
+					let entity = ctx.params.projects;
+					for (let i = 0; i < entity.length; i++) {
+						let project = entity[i];
+						console.log(project.title)
+						// let updated = await adapter.updateById(project._id, {
+						// 	$set: {
+						// 		trigger: Date.now() + project.maxTime,
+						// 		updatedAt: new Date()
+						// 	}
+						// })
+
+					}
+					console.log("Alert Cleared")
+					return { status: "success" }
+
+
+				}
+				catch (err) {
+					console.log(err)
+					throw new MoleculerClientError("Scheduler Error!", 422, "", [{ field: "Failure", message: " Update Failure" }]);
 
 				}
 			}
