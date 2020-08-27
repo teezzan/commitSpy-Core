@@ -1,7 +1,6 @@
 version: "3.3"
 
 services:
-
   api:
     build:
       context: .
@@ -19,25 +18,52 @@ services:
     networks:
       - internal
 
-  greeter:
+  notification:
     build:
       context: .
     image: committ
     env_file: docker-compose.env
     environment:
-      SERVICES: greeter
+      SERVICES: notification
     depends_on:
+      - mongo
       - nats
     networks:
       - internal
 
-  products:
+  payment:
     build:
       context: .
     image: committ
     env_file: docker-compose.env
     environment:
-      SERVICES: products
+      SERVICES: payment
+    depends_on:
+      - mongo
+      - nats
+    networks:
+      - internal
+
+  project:
+    build:
+      context: .
+    image: committ
+    env_file: docker-compose.env
+    environment:
+      SERVICES: project
+    depends_on:
+      - mongo
+      - nats
+    networks:
+      - internal
+
+  user:
+    build:
+      context: .
+    image: committ
+    env_file: docker-compose.env
+    environment:
+      SERVICES: user
     depends_on:
       - mongo
       - nats

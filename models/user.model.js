@@ -16,6 +16,11 @@ let UserSchema = new Schema({
 		type: String,
 		unique: true
 	},
+	git_token: {
+		type: String,
+		unique: true,
+		required: "Needed",
+	},
 	password: {
 		type: String,
 		required: "Please fill in a password"

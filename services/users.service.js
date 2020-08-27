@@ -15,7 +15,7 @@ module.exports = {
 	mixins: [
 		DbService
 	],
-	adapter: new MongooseAdapter(/*process.env.MONGO_URI ||*/"mongodb://localhost:27017/msv", { useNewUrlParser: true, useUnifiedTopology: true }),
+	adapter: new MongooseAdapter(process.env.MONGO_URI || "", { useNewUrlParser: true, useUnifiedTopology: true }),
 	model: User,
 
 	/**
@@ -31,9 +31,19 @@ module.exports = {
 		fields: ["_id", "username", "git_id", "email", "twitter", "avatar"],
 
 		/** Validator schema for entity */
+		/**
+		 * First, User clicks on github OAuth Button to get started
+		 * Then, github authorises the app and redirect with the temporary token
+		 * Client app exchanges the token for a permanent one
+		 * client fetches the details, populate form and ask for password.
+		 * sends to server which is the normal signup
+		 *
+		 * for Login, use either OAuth or email and password
+		 */
 		entityValidator: {
 			username: { type: "string", min: 2 },
 			git_id: { type: "string", min: 2 },
+			git_token: { type: "string", min: 2 },
 			password: { type: "string", min: 6 },
 			email: { type: "email" },
 			avatar: { type: "string", optional: true },
@@ -75,8 +85,6 @@ module.exports = {
 				}
 
 				entity.password = bcrypt.hashSync(entity.password, 10);
-				entity.bio = entity.bio || "";
-				entity.image = entity.image || null;
 				entity.createdAt = new Date();
 
 				const doc = await this.adapter.insert(entity);

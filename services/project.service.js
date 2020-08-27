@@ -12,7 +12,7 @@ module.exports = {
 	mixins: [
 		DbService
 	],
-	adapter: new MongooseAdapter(/*process.env.MONGO_URI ||*/"mongodb://localhost:27017/msv", { useNewUrlParser: true, useUnifiedTopology: true }),
+	adapter: new MongooseAdapter(process.env.MONGO_URI || "", { useNewUrlParser: true, useUnifiedTopology: true }),
 	model: Project,
 
 	/**
