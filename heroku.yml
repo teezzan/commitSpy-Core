@@ -1,0 +1,8 @@
+setup:
+  env_file: docker-compose.env
+build:
+  docker:
+    web: Dockerfile
+run:
+  web: npm start
+  env_file: docker-compose.env
