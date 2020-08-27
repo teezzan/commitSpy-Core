@@ -1,5 +1,3 @@
-setup:
-  env_file: docker-compose.env
 build:
   docker:
     web: Dockerfile
