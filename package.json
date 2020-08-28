@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "My Moleculer-based microservices project",
   "scripts": {
-    "dev": "moleculer-runner --repl --hot services/**/*.service.js",
+    "dev": "moleculer-runner --repl --env --hot services/**/*.service.js ",
     "start": "moleculer-runner",
     "cli": "moleculer connect NATS",
     "ci": "jest --watch",
@@ -27,6 +27,7 @@
   "dependencies": {
     "@sendgrid/mail": "^7.2.4",
     "bcryptjs": "^2.4.3",
+    "dotenv": "^8.2.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.20",
     "mailgun-js": "^0.22.0",
