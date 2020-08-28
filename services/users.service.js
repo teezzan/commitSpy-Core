@@ -23,7 +23,7 @@ module.exports = {
 	 */
 	settings: {
 		/** REST Basepath */
-		rest: "/",
+		rest: "/users",
 		/** Secret for JWT */
 		JWT_SECRET: process.env.JWT_SECRET || "jwt-conduit-secret",
 
@@ -64,7 +64,7 @@ module.exports = {
 		 * @returns {Object} Created entity & token
 		 */
 		create: {
-			rest: "POST /users",
+			rest: "POST /register",
 			params: {
 				user: { type: "object" }
 			},
@@ -104,7 +104,7 @@ module.exports = {
 		 * @returns {Object} Logged in user with token
 		 */
 		login: {
-			rest: "POST /users/login",
+			rest: "POST /login",
 			params: {
 				user: {
 					type: "object", props: {
@@ -171,7 +171,7 @@ module.exports = {
 		 */
 		me: {
 			auth: "required",
-			rest: "GET /user",
+			rest: "GET /me",
 			// cache: {
 			// 	keys: ["#userID"]
 			// },
@@ -197,7 +197,7 @@ module.exports = {
 		 */
 		updateMyself: {
 			auth: "required",
-			rest: "PUT /user",
+			rest: "PUT /me",
 			params: {
 				user: {
 					type: "object", props: {
@@ -250,16 +250,16 @@ module.exports = {
 			}
 		},
 		list: {
-			rest: "GET /users",
+			rest: "GET /",
 			auth: "required"
 		},
 
 		get: {
-			rest: "GET /users/:id"
+			rest: "GET /:id"
 		},
 
 		update: {
-			rest: "PUT /users/:id",
+			rest: "PUT /:id",
 			auth: "required"
 		},
 
