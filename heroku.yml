@@ -3,4 +3,3 @@ build:
     web: Dockerfile
 run:
   web: npm start
-  env_file: .env
