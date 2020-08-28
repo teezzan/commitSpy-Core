@@ -58,7 +58,7 @@ module.exports = {
 	// More info: https://moleculer.services/docs/0.14/networking.html
 	// Note: During the development, you don't need to define it because all services will be loaded locally.
 	// In production you can set it via `TRANSPORTER=nats://localhost:4222` environment variable.
-	transporter: null, //"NATS"
+	transporter: "NATS",
 
 	// Define a cacher.
 	// More info: https://moleculer.services/docs/0.14/caching.html
@@ -152,7 +152,7 @@ module.exports = {
 
 	// Enable/disable built-in metrics function. More info: https://moleculer.services/docs/0.14/metrics.html
 	metrics: {
-		enabled: true,
+		enabled: false,
 		// Available built-in reporters: "Console", "CSV", "Event", "Prometheus", "Datadog", "StatsD"
 		reporter: {
 			type: "Prometheus",
