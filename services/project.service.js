@@ -21,6 +21,14 @@ module.exports = {
 	settings: {
 		/** REST Basepath */
 		rest: "/project",
+		cors: {
+			origin: "*",
+			methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
+			allowedHeaders: [],
+			exposedHeaders: [],
+			credentials: false,
+			maxAge: 3600
+		},
 
 		/** Public fields */
 		fields: ["_id", "title", "git_id", "setMinCommit", "maxTime", "author", "trigger", "alarmType", "weeklyCommits", "billing"],

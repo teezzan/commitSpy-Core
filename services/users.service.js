@@ -22,6 +22,14 @@ module.exports = {
 	 * Default settings
 	 */
 	settings: {
+		cors: {
+			origin: "*",
+			methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
+			allowedHeaders: [],
+			exposedHeaders: [],
+			credentials: false,
+			maxAge: 3600
+		},
 		/** REST Basepath */
 		rest: "/users",
 		/** Secret for JWT */
