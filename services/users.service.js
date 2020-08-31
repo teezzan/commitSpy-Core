@@ -7,7 +7,8 @@ const jwt = require("jsonwebtoken");
 const DbService = require("moleculer-db");
 const MongooseAdapter = require("moleculer-db-adapter-mongoose");
 const User = require("../models/user.model");
-const crypto = require('crypto')
+const crypto = require('crypto');
+const axios = require('axios');
 // const CacheCleanerMixin = require("../mixins/cache.cleaner.mixin");
 
 module.exports = {
@@ -281,7 +282,7 @@ module.exports = {
 		 *
 		 * @actions
 		 *
-		 * @param {String} username - Username
+		 * @param {String} _id - id
 		 * @returns {Object} User entity
 		 */
 		getbygitID: {
@@ -296,6 +297,47 @@ module.exports = {
 
 				const doc = await this.transformDocuments(ctx, {}, user);
 				return doc;
+			}
+		},
+
+		registerwithtoken: {
+
+			params: {
+				password: { type: "string", min: 6 },
+				access_token: { type: "string", min: 6 },
+				scope: { type: "string", min: 6 },
+				token_type: { type: "string", min: 6 },
+
+			},
+			async handler(ctx) {
+				try {
+					axios.get('https://api.github.com/user', {
+						params: {
+							access_token: ctx.params.access_token,
+							token_type: ctx.params.token_type,
+							scope: ctx.params.scope,
+
+						}
+					}).then((response) => {
+						let data = response.data;
+						let user = {
+							email: data.email,
+							git_id: data.id,
+							git_token: data.token,
+							username: data.name,
+							password: ctx.params.password
+						}
+						let user = await ctx.call("users.create", { user });
+						return user
+
+
+					})
+
+				} catch{
+					throw new MoleculerClientError("bad details!", 404);
+
+				}
+
 			}
 		}
 

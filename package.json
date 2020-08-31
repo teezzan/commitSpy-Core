@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@sendgrid/mail": "^7.2.4",
+    "axios": "^0.19.2",
     "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
     "jsonwebtoken": "^8.5.1",
