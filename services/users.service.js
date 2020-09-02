@@ -316,9 +316,9 @@ module.exports = {
 						params: {
 							access_token: ctx.params.access_token,
 							token_type: ctx.params.token_type,
-							scope: ctx.params.scope
+							scope: "repo, user"
 						}
-					}).then((response) => {
+					}).then(async (response) => {
 						console.log("here")
 						let data = response.data;
 						console.log(response.data)
@@ -331,9 +331,10 @@ module.exports = {
 							avatar: data.avatar_url,
 							twitter: data.twitter_username
 						}
-						let user = await ctx.call("users.create", { user });
+						console.log(data)
+						let useres = await ctx.call("users.create", { user });
 
-						return user
+						return useres
 
 
 					})
@@ -343,7 +344,7 @@ module.exports = {
 						})
 
 				} catch{
-					throw new MoleculerClientError("bad details!", 404);
+					throw new MoleculerClientError("bad details!", 422);
 
 				}
 
