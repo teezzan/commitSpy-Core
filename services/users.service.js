@@ -301,12 +301,13 @@ module.exports = {
 		},
 
 		registerwithtoken: {
-
+			rest: "POST /regtoken",
 			params: {
 				password: { type: "string", min: 6 },
 				access_token: { type: "string", min: 6 },
-				scope: { type: "string", min: 6 },
-				token_type: { type: "string", min: 6 },
+				scope: { type: "string" },
+				token_type: { type: "string" },
+				email: { type: "string" }
 
 			},
 			async handler(ctx) {
@@ -315,23 +316,31 @@ module.exports = {
 						params: {
 							access_token: ctx.params.access_token,
 							token_type: ctx.params.token_type,
-							scope: ctx.params.scope,
-
+							scope: ctx.params.scope
 						}
 					}).then((response) => {
+						console.log("here")
 						let data = response.data;
+						console.log(response.data)
 						let user = {
-							email: data.email,
+							email: ctx.params.email,
 							git_id: data.id,
 							git_token: data.token,
 							username: data.name,
-							password: ctx.params.password
+							password: ctx.params.password,
+							avatar: data.avatar_url,
+							twitter: data.twitter_username
 						}
 						let user = await ctx.call("users.create", { user });
+
 						return user
 
 
 					})
+						.catch((err) => {
+							console.log(err)
+							return err
+						})
 
 				} catch{
 					throw new MoleculerClientError("bad details!", 404);

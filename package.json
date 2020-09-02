@@ -25,6 +25,7 @@
     "moleculer-repl": "^0.6.2"
   },
   "dependencies": {
+    "@octokit/rest": "^18.0.4",
     "@sendgrid/mail": "^7.2.4",
     "axios": "^0.19.2",
     "bcryptjs": "^2.4.3",
