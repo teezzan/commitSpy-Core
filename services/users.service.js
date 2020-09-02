@@ -316,9 +316,9 @@ module.exports = {
 						params: {
 							access_token: ctx.params.access_token,
 							token_type: ctx.params.token_type,
-							scope: "repo, user"
+							scope
 						}
-					}).then(async (response) => {
+					}).then((response) => {
 						console.log("here")
 						let data = response.data;
 						console.log(response.data)
@@ -334,7 +334,7 @@ module.exports = {
 						console.log(response)
 						// let useres = await ctx.call("users.create", { user });
 
-						return "useres"
+						return user
 
 
 					})
