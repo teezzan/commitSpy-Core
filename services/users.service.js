@@ -329,7 +329,7 @@ module.exports = {
 						avatar: data.avatar_url,
 						twitter: data.twitter_username
 					}
-					// console.log(user)
+					console.log("user =", user)
 					let a = await ctx.call("users.create", { user })
 
 					return a
