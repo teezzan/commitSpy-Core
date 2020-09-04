@@ -52,7 +52,6 @@ module.exports = {
 		entityValidator: {
 			username: { type: "string", min: 2 },
 			git_id: { type: "string", min: 2 },
-			git_token: { type: "string", min: 2 },
 			password: { type: "string", min: 6 },
 			email: { type: "email" },
 			avatar: { type: "string", optional: true },
@@ -100,6 +99,7 @@ module.exports = {
 				const user = await this.transformDocuments(ctx, {}, doc);
 				const json = await this.transformEntity(user, true, ctx.meta.token);
 				await this.entityChanged("created", json, ctx);
+				// console.log(json)
 				return json;
 			}
 		},
@@ -312,38 +312,30 @@ module.exports = {
 			},
 			async handler(ctx) {
 				try {
-					axios.get('https://api.github.com/user', {
+
+					let res = await axios.get('https://api.github.com/user', {
 						params: {
 							access_token: ctx.params.access_token,
 							token_type: ctx.params.token_type,
-							scope
+							scope: ctx.params.scope
 						}
-					}).then((response) => {
-						console.log("here")
-						let data = response.data;
-						console.log(response.data)
-						let user = {
-							email: ctx.params.email,
-							git_id: data.id,
-							git_token: data.token,
-							username: data.name,
-							password: ctx.params.password,
-							avatar: data.avatar_url,
-							twitter: data.twitter_username
-						}
-						console.log(response)
-						// let useres = await ctx.call("users.create", { user });
-
-						return user
-
-
 					})
-						.catch((err) => {
-							console.log(err)
-							return err
-						})
+					let data = res.data;
+					let user = {
+						email: ctx.params.email,
+						git_id: `${data.id}`,
+						username: data.name,
+						password: ctx.params.password,
+						avatar: data.avatar_url,
+						twitter: data.twitter_username
+					}
+					// console.log(user)
+					let a = await ctx.call("users.create", { user })
 
-				} catch{
+					return a
+
+				} catch (err) {
+					console.log(err)
 					throw new MoleculerClientError("bad details!", 422);
 
 				}

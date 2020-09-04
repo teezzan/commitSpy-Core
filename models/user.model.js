@@ -19,7 +19,7 @@ let UserSchema = new Schema({
 	git_token: {
 		type: String,
 		unique: true,
-		required: "Needed",
+		"default": ""
 	},
 	password: {
 		type: String,
@@ -41,7 +41,6 @@ let UserSchema = new Schema({
 	twitter: {
 		type: String,
 		trim: true,
-		unique: true,
 		// lowercase: true,
 		// required: "Please fill in an email"
 	},
