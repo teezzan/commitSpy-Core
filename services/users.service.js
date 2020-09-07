@@ -208,11 +208,15 @@ module.exports = {
 			async handler(ctx) {
 				console.log(ctx)
 				const user = await this.getById(ctx.meta.user1._id);
-				if (!user)
+				if (!user) {
 					throw new MoleculerClientError("User not found!", 400);
-				let res = await axios.get(`https://api.github.com/users/${user.username}/repos`)
-				let data = res;
-				return data;
+				} else {
+					console.log(user);
+					let res = await axios.get(`https://api.github.com/users/${user.username}/repos`)
+					let data = res;
+					return data;
+				}
+
 			}
 		},
 		/**
