@@ -349,9 +349,9 @@ module.exports = {
 						twitter: data.twitter_username
 					}
 					console.log("user =", user)
-					let a = await ctx.call("users.create", { user })
+					// let a = await ctx.call("users.create", { user })
 
-					return a
+					return data
 
 				} catch (err) {
 					console.log(err)
