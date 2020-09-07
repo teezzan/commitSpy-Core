@@ -194,7 +194,27 @@ module.exports = {
 				return await this.transformEntity(doc, true, ctx.meta.token);
 			}
 		},
-
+		/**
+		 * Get current user entity repos.
+		 * Auth is required!
+		 *
+		 * @actions
+		 *
+		 * @returns {Object} User entity
+		 */
+		getrepos: {
+			auth: "required",
+			rest: "GET /repos",
+			async handler(ctx) {
+				console.log(ctx)
+				const user = await this.getById(ctx.meta.user1._id);
+				if (!user)
+					throw new MoleculerClientError("User not found!", 400);
+				let res = await axios.get(`https://api.github.com/users/${user.username}/repos`)
+				let data = res;
+				return data;
+			}
+		},
 		/**
 		 * Update current user entity.
 		 * Auth is required!
@@ -262,21 +282,16 @@ module.exports = {
 			rest: "GET /",
 			auth: "required"
 		},
-
 		get: {
 			rest: "GET /:id"
 		},
-
 		update: {
 			rest: "PUT /:id",
 			auth: "required"
 		},
-
 		remove: {
 			// rest: "DELETE /users/:id"
 		},
-
-
 		/**
 		 * Get a user profile.
 		 *
