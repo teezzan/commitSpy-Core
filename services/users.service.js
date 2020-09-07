@@ -343,15 +343,15 @@ module.exports = {
 					let user = {
 						email: ctx.params.email,
 						git_id: `${data.id}`,
-						username: data.name,
+						username: data.login,
 						password: ctx.params.password,
 						avatar: data.avatar_url,
 						twitter: data.twitter_username
 					}
-					console.log("user =", user)
-					// let a = await ctx.call("users.create", { user })
+					// console.log("user =", user)
+					let a = await ctx.call("users.create", { user })
 
-					return data
+					return a
 
 				} catch (err) {
 					console.log(err)
