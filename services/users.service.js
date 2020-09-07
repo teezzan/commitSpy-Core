@@ -206,15 +206,16 @@ module.exports = {
 			auth: "required",
 			rest: "GET /repos",
 			async handler(ctx) {
-				console.log(ctx)
+				// console.log(ctx)
 				const user = await this.getById(ctx.meta.user1._id);
 				if (!user) {
 					throw new MoleculerClientError("User not found!", 400);
 				} else {
 					console.log(user);
-					let res = await axios.get(`https://api.github.com/users/${user.username}/repos`)
-					let data = res;
-					return data;
+					let res = await axios.get(`https://api.github.com/users/${user.username}/repos`);
+					console.log(res);
+					let data = "res";
+					return { data };
 				}
 
 			}
