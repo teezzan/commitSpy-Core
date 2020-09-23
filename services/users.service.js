@@ -78,7 +78,7 @@ module.exports = {
 			},
 			async handler(ctx) {
 				let entity = ctx.params.user;
-				console.log(entity);
+				// console.log(entity);
 				await this.validateEntity(entity);
 				if (entity.username) {
 					const found = await this.adapter.findOne({ username: entity.username });
@@ -185,7 +185,7 @@ module.exports = {
 			// 	keys: ["#userID"]
 			// },
 			async handler(ctx) {
-				console.log(ctx)
+				// console.log(ctx)
 				const user = await this.getById(ctx.meta.user1._id);
 				if (!user)
 					throw new MoleculerClientError("User not found!", 400);

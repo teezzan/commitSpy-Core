@@ -78,7 +78,7 @@ module.exports = {
 			},
 			async handler(ctx) {
 				let entity = ctx.params.project;
-				console.log(entity);
+				// console.log(entity);
 				await this.validateEntity(entity);
 				if (entity.title) {
 					const found = await this.adapter.findOne({ title: entity.title });
@@ -193,7 +193,7 @@ module.exports = {
 				try {
 					// console.log(ctx.meta.user1)filters = { author: ctx.meta.user1._id }
 					const doc = await this.adapter.find({ query: { author: ctx.meta.user1._id } });
-					console.log(doc)
+					// console.log(doc)
 					const project = await this.transformDocuments(ctx, {}, doc);
 					const json = await this.transformEntity(project);
 					await this.entityChanged("found", json, ctx);
@@ -233,7 +233,7 @@ module.exports = {
 								doc.weeklyCommits.push(temp);
 								if (no_commit >= doc.setMinCommit) {
 									//move the alarm and send notification
-									console.log("here1");
+									// console.log("here1");
 									doc.trigger = new Date(doc.trigger).getTime() + doc.maxTime;
 								}
 							} else {
@@ -241,7 +241,7 @@ module.exports = {
 								doc.weeklyCommits[cursor].totalCommit = doc.weeklyCommits[cursor].totalCommit + no_commit;
 								if (doc.weeklyCommits[cursor].totalCommit >= doc.setMinCommit && prevreading < doc.setMinCommit) {
 									//move the alarm and send notification
-									console.log("here2");
+									// console.log("here2");
 									doc.trigger = new Date(doc.trigger).getTime() + doc.maxTime;
 								}
 							}
@@ -252,7 +252,7 @@ module.exports = {
 							};
 							let docc = await this.adapter.updateById(doc._id, update);
 							if (docc) {
-								console.log("success ", docc);
+								// console.log("success ", docc);
 								//cleanup
 							}
 							return docc
@@ -375,7 +375,7 @@ module.exports = {
 					let entity = ctx.params.projects;
 					for (let i = 0; i < entity.length; i++) {
 						let project = entity[i];
-						console.log(project.title)
+						// console.log(project.title)
 						let updated = await this.adapter.updateById(project._id, {
 							$set: {
 								trigger: Date.now() + project.maxTime,
