@@ -403,10 +403,10 @@ module.exports = {
 		// 	auth: "required"
 		// },
 
-		// remove: {
-		// 	rest: "DELETE /projects/:id",
-		// 	auth: "required"
-		// },
+		remove: {
+			rest: "DELETE /projects/:id",
+			auth: "required"
+		},
 
 
 	},
