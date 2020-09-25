@@ -72,9 +72,10 @@ module.exports = {
 						.then(res => {
 							console.log("Success  sending Paid alert=>")
 							// console.log(res)
-							//call action to deduct money and move to another account where we then split and distribute accordingly
 							//call action to clear trigger
 							let clear = ctx.call("project.clearAlert", { projects: entity });
+							//call action to deduct money and move to another account where we then split and distribute accordingly
+							let deducted = ctx.call("payment.deductAlert", { projects: entity });
 							return { status: "successs", mailpayload }
 						})
 						.catch(err => {
@@ -123,7 +124,6 @@ module.exports = {
 					sgMail.send(mailpayload).then(res => {
 						console.log("Success sending unpaid =>")
 						// console.log(res)
-						//call action to deduct money and move to another account where we then split and distribute accordingly
 						//call action to clear trigger
 						let clear = ctx.call("project.clearAlert", { projects: entity });
 						return { status: "successs", mailpayload }

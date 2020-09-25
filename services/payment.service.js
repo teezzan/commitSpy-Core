@@ -33,21 +33,6 @@ module.exports = {
 	settings: {
 		/** REST Basepath */
 		rest: "/payment",
-
-		// /** Public fields */
-		// fields: ["_id", "title", "git_id", "setMinCommit", "maxTime", "author", "trigger", "alarmType", "weeklyCommits", "billing"],
-
-		/** Validator schema for entity */
-		entityValidator: {
-			author: { type: "object" },
-			alarmType: { type: "number" },
-			_id: { type: "string" },
-			trigger: { type: "string", optional: true },
-			maxTime: { type: "number", optional: true },
-			setMinCommit: { type: "number" },
-			title: { type: "string", min: 2 },
-			weeklyCommits: { type: "number" },
-		}
 	},
 
 	/**
@@ -62,12 +47,15 @@ module.exports = {
 			async handler(ctx) {
 
 				try {
-					console.log("sending paid alert");
+					console.log("deducting");
 					const account = await this.adapter.findOne({ name: 'Main' });
 
 					let entity = ctx.params.projects;
 					for (let i = 0; i < entity.length; i++) {
 						let project = entity[i];
+						//update project
+						let res = await ctx.call("project.addDeductHistory", { payload: { _id: project._id, amount: 1 } })
+						let user = await ctx.call("users.deductWallet", { payload: { _id: project.author._id, cost: 1 } });
 
 						let updated = await this.adapter.updateById(account._id, {
 							$set: {
@@ -84,10 +72,6 @@ module.exports = {
 								totalEgress: 1
 							}
 						});
-						let user = await ctx.call("users.deductWallet", { payload: { _id: project.author._id, cost: 1 } });
-
-
-
 					}
 				}
 				catch (err) {
@@ -118,24 +102,7 @@ module.exports = {
 
 			async handler(ctx) {
 				try {
-					const account = await this.adapter.findOne({ name: 'Main' });
-					let updated = await this.adapter.updateById(account._id, {
-						$set: {
-							updatedAt: new Date()
-						},
-						$push: {
-							egress: {
-								amount: 1,
-								date: new Date(),
-								author: "5f41c30f5889a175f8e7fdea"
-							}
-						},
-						$inc: {
-							totalEgress: 1
-						}
-					});
-					console.log(updated)
-					return updated
+					return "res"
 				}
 				catch (err) {
 					console.log(err)

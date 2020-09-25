@@ -397,6 +397,31 @@ module.exports = {
 				}
 			}
 		},
+		addDeductHistory: {
+			params: {
+				payload: { type: "object" }
+			},
+			async handler(ctx) {
+				try {
+					const payload = ctx.params.payload;
+					let project = this.adapter.updateById(payload._id, {
+						$set: {
+							updatedAt: new Date()
+						},
+						$push: {
+							commitBills: {
+								amount: payload.amount,
+								date: new Date()
+							}
+						}
+					});
+					return project
+				} catch (err) {
+					console.log(err);
+					throw new MoleculerClientError("Internal Error!", 500, "", [{ field: "Failure", message: " Internal Failure" }]);
+				}
+			}
+		},
 
 
 		// update: {
