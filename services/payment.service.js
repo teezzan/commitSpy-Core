@@ -5,6 +5,7 @@ const { MoleculerClientError } = require("moleculer").Errors;
 const DbService = require("moleculer-db");
 const MongooseAdapter = require("moleculer-db-adapter-mongoose");
 const Account = require("../models/account.model");
+let axios = require('axios');
 module.exports = {
 	name: "payment",
 	mixins: [
@@ -82,12 +83,46 @@ module.exports = {
 			}
 		},
 		acceptPayment: {
+			auth: "required",
+			rest: "GET /init",
 			params: {
-				projects: { type: "array" }
+				payment: { type: "object" }
 			},
 			async handler(ctx) {
 
 				try {
+					let currency = ['USD', 'NGN', 'GHS']
+					const payment = ctx.params.payment;
+					if (payment.amount > 0 && currency.indexOf(payment.currency) >= 0) {
+						let payload = {
+							email: ctx.meta.user1.email,
+							amount: payment.amount,
+							reference: `${ctx.meta.user1._id}==${Date.now()}`,
+							currency: payment.currency
+						}
+						let res = await axios.post('https://api.paystack.co/transaction/initialize', payload, {
+							headers: {
+								'authorization': `Bearer ${process.env.PAYSTACK_PRIVATE_KEY}`,
+								'Content-Type': 'application/json'
+							}
+						})
+						// return res.data
+						if (res.data.status) {
+							let data = res.data.data;
+							return { authorization_url: data.authorization_url };
+
+						} else {
+							return { status: false, message: "Payment server unavailable" }
+						}
+
+					}
+					else {
+						throw new MoleculerClientError("Payment Details Error!", 422, "", [{ field: "Failure", message: " Check Details. Amount must be greater than 0" }]);
+
+					}
+
+
+
 
 				}
 				catch (err) {
