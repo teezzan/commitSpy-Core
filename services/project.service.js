@@ -31,7 +31,7 @@ module.exports = {
 		},
 
 		/** Public fields */
-		fields: ["_id", "title", "git_id", "setMinCommit", "maxTime", "author", "trigger", "alarmType", "weeklyCommits", "billing", "remainCommit"],
+		fields: ["_id", "title", "git_id", "setMinCommit", "maxTime", "author", "trigger", "alarmType", "weeklyCommits", "billing", "rawCommits"],
 
 		/** Validator schema for entity */
 		entityValidator: {
@@ -171,6 +171,8 @@ module.exports = {
 					}
 					if (newData.maxTime !== repo.maxTime) {
 						newData.trigger = Date.now() + newData.maxTime;
+					} else {
+						newData.trigger = repo.trigger
 					}
 
 					const update = {
@@ -197,6 +199,7 @@ module.exports = {
 					// console.log(ctx.meta.user1)filters = { author: ctx.meta.user1._id }
 					const doc = await this.adapter.find({ query: { author: ctx.meta.user1._id } });
 					// console.log(doc)
+					//compute
 					const project = await this.transformDocuments(ctx, {}, doc);
 					const json = await this.transformEntity(project);
 					await this.entityChanged("found", json, ctx);
@@ -232,25 +235,32 @@ module.exports = {
 							let cursor = doc.weeklyCommits.findIndex(x => x.week == wkyr.week && x.year == wkyr.year)
 							// push commit into dump
 							doc.rawCommits.push({ date: Date.now(), numberOfCommit: no_commit })
+
 							if (cursor == -1) {
 								//create
 								let temp = { week: wkyr.week, year: wkyr.year, totalCommit: no_commit }
 								doc.weeklyCommits.push(temp);
 								//use another function to get status based on current setMinCommit
-								if (no_commit >= doc.setMinCommit) {
-									//move the alarm and send notification
-									// console.log("here1");
-									doc.trigger = new Date(doc.trigger).getTime() + doc.maxTime;
-								}
+								// if (cur_total >= doc.setMinCommit) {
+								// 	//move the alarm and send notification
+								// 	// console.log("here1");
+								// 	doc.trigger = new Date(doc.trigger).getTime() + doc.maxTime;
+								// }
+
 							} else {
 								let prevreading = doc.weeklyCommits[cursor].totalCommit;
 								doc.weeklyCommits[cursor].totalCommit = doc.weeklyCommits[cursor].totalCommit + no_commit;
 								//use another function to get status based on current setMinCommit
-								if (doc.weeklyCommits[cursor].totalCommit >= doc.setMinCommit && prevreading < doc.setMinCommit) {
-									//move the alarm and send notification
-									// console.log("here2");
-									doc.trigger = new Date(doc.trigger).getTime() + doc.maxTime;
-								}
+								// if (doc.weeklyCommits[cursor].totalCommit >= doc.setMinCommit && prevreading < doc.setMinCommit) {
+								// 	//move the alarm and send notification
+								// 	// console.log("here2");
+								// 	doc.trigger = new Date(doc.trigger).getTime() + doc.maxTime;
+								// }
+							}
+							//update Trigger here
+							let cur_total = this.extractCommits(docs.rawCommits, docs.trigger - maxTime);
+							if (cur_total - no_commit <= doc.setMinCommit && cur_total >= doc.setMinCommit) {
+								doc.trigger = new Date(doc.trigger).getTime() + doc.maxTime;
 							}
 
 
@@ -388,6 +398,7 @@ module.exports = {
 						let updated = await this.adapter.updateById(project._id, {
 							$set: {
 								trigger: Date.now() + project.maxTime,
+								// sessionCommit = 0,
 								updatedAt: new Date()
 							}//add the amount...
 						})
@@ -439,7 +450,9 @@ module.exports = {
 
 		remove: {
 			rest: "DELETE /projects/:id",
-			auth: "required"
+			auth: "required",
+			async handler(ctx) { }
+
 		},
 
 
@@ -459,6 +472,23 @@ module.exports = {
 		transformEntity(project) {
 
 			return { project };
+		},
+
+		/**
+		 * extract Commit from dump
+		 *
+		 * @param {Object} project
+		 */
+		extractCommits(dump, prev) {
+			let total = 0;
+			let list = dump.filter(commit => {
+				return commit.date >= prev && commit.date < Date.now();
+
+			});
+			for (let i = 0; i < list.length; i++) {
+				total += list[i].numberOfCommit
+			}
+			return total;
 		},
 
 		/**

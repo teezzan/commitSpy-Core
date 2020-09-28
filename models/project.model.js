@@ -48,10 +48,6 @@ let ProjectSchema = new Schema({
 		date: Date,
 		numberOfCommit: Number,
 	}],
-	remainCommit: {
-		type: Number,
-		"default": 0
-	},
 	commitBills: [{
 		amount: Number,
 		date: Date,
