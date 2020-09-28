@@ -18,8 +18,6 @@ let UserSchema = new Schema({
 	},
 	git_token: {
 		type: String,
-		unique: true,
-		"default": ""
 	},
 	password: {
 		type: String,
