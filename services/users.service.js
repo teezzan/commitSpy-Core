@@ -347,7 +347,7 @@ module.exports = {
 						avatar: data.avatar_url,
 						twitter: data.twitter_username
 					}
-					console.log("user =", user)
+					console.log("user is =", user)
 					console.log("creating user ")
 					let a = await ctx.call("users.create", { user })
 
