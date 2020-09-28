@@ -330,7 +330,7 @@ module.exports = {
 			},
 			async handler(ctx) {
 				try {
-
+					console.log(ctx.params)
 					let res = await axios.get('https://api.github.com/user', {
 						params: {
 							access_token: ctx.params.access_token,
@@ -347,7 +347,8 @@ module.exports = {
 						avatar: data.avatar_url,
 						twitter: data.twitter_username
 					}
-					// console.log("user =", user)
+					console.log("user =", user)
+					console.log("creating user ")
 					let a = await ctx.call("users.create", { user })
 
 					return a

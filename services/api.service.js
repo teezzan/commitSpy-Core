@@ -16,7 +16,7 @@ module.exports = {
 	// More info about settings: https://moleculer.services/docs/0.14/moleculer-web.html
 	settings: {
 		// Exposed port
-		port: process.env.PORT || 3100,
+		port: process.env.PORT || 3000,
 
 		// Exposed IP
 		ip: "0.0.0.0",
@@ -144,8 +144,6 @@ module.exports = {
 		 * Check the token value & resolve the user by the token.
 		 * The resolved user will be available in `ctx.meta.user`
 		 *
-		 * PLEASE NOTE, IT'S JUST AN EXAMPLE IMPLEMENTATION. DO NOT USE IN PRODUCTION!
-		 *
 		 * @param {Context} ctx
 		 * @param {Object} route
 		 * @param {IncomingRequest} req
@@ -166,6 +164,8 @@ module.exports = {
 			if (token) {
 				// Verify JWT token
 				try {
+
+
 					user = await ctx.call("users.resolveToken", { token });
 					if (user) {
 						this.logger.info("Authenticated via JWT: ", user.username);
