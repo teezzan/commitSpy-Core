@@ -240,22 +240,11 @@ module.exports = {
 								//create
 								let temp = { week: wkyr.week, year: wkyr.year, totalCommit: no_commit }
 								doc.weeklyCommits.push(temp);
-								//use another function to get status based on current setMinCommit
-								// if (cur_total >= doc.setMinCommit) {
-								// 	//move the alarm and send notification
-								// 	// console.log("here1");
-								// 	doc.trigger = new Date(doc.trigger).getTime() + doc.maxTime;
-								// }
 
 							} else {
 								let prevreading = doc.weeklyCommits[cursor].totalCommit;
 								doc.weeklyCommits[cursor].totalCommit = doc.weeklyCommits[cursor].totalCommit + no_commit;
-								//use another function to get status based on current setMinCommit
-								// if (doc.weeklyCommits[cursor].totalCommit >= doc.setMinCommit && prevreading < doc.setMinCommit) {
-								// 	//move the alarm and send notification
-								// 	// console.log("here2");
-								// 	doc.trigger = new Date(doc.trigger).getTime() + doc.maxTime;
-								// }
+
 							}
 							//update Trigger here
 							let cur_total = this.extractCommits(docs.rawCommits, docs.trigger - maxTime);
