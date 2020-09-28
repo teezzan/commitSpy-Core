@@ -44,6 +44,14 @@ let ProjectSchema = new Schema({
 		year: Number,
 		totalCommit: Number
 	}],
+	rawCommits: [{
+		date: Date,
+		numberOfCommit: Number,
+	}],
+	remainCommit: {
+		type: Number,
+		"default": 0
+	},
 	commitBills: [{
 		amount: Number,
 		date: Date,

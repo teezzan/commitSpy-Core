@@ -31,7 +31,7 @@ module.exports = {
 		},
 
 		/** Public fields */
-		fields: ["_id", "title", "git_id", "setMinCommit", "maxTime", "author", "trigger", "alarmType", "weeklyCommits", "billing"],
+		fields: ["_id", "title", "git_id", "setMinCommit", "maxTime", "author", "trigger", "alarmType", "weeklyCommits", "billing", "remainCommit"],
 
 		/** Validator schema for entity */
 		entityValidator: {
@@ -228,10 +228,13 @@ module.exports = {
 							}
 							var wkyr = this.getWeekyear();
 							let cursor = doc.weeklyCommits.findIndex(x => x.week == wkyr.week && x.year == wkyr.year)
+							// push commit into dump
+							doc.rawCommits.push({ date: Date.now(), numberOfCommit: no_commit })
 							if (cursor == -1) {
 								//create
 								let temp = { week: wkyr.week, year: wkyr.year, totalCommit: no_commit }
 								doc.weeklyCommits.push(temp);
+								//use another function to get status based on current setMinCommit
 								if (no_commit >= doc.setMinCommit) {
 									//move the alarm and send notification
 									// console.log("here1");
@@ -240,12 +243,15 @@ module.exports = {
 							} else {
 								let prevreading = doc.weeklyCommits[cursor].totalCommit;
 								doc.weeklyCommits[cursor].totalCommit = doc.weeklyCommits[cursor].totalCommit + no_commit;
+								//use another function to get status based on current setMinCommit
 								if (doc.weeklyCommits[cursor].totalCommit >= doc.setMinCommit && prevreading < doc.setMinCommit) {
 									//move the alarm and send notification
 									// console.log("here2");
 									doc.trigger = new Date(doc.trigger).getTime() + doc.maxTime;
 								}
 							}
+
+
 							//"trigger": "2020-08-29T20:59:55.029Z",
 							doc.updatedAt = new Date();
 							let update = {
