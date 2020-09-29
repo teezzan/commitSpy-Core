@@ -38,7 +38,7 @@ let UserSchema = new Schema({
 	},
 	twitter: {
 		type: String,
-		trim: true,
+		// trim: true,
 		// lowercase: true,
 		// required: "Please fill in an email"
 	},

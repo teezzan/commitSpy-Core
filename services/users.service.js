@@ -131,7 +131,7 @@ module.exports = {
 
 				const res = await bcrypt.compare(password, user.password);
 				if (!res)
-					throw new MoleculerClientError("Wrong password!", 422, "", [{ field: "email", message: "is not found" }]);
+					throw new MoleculerClientError("Wrong password!", 422, "", [{ field: "wrong Password", message: "is not found" }]);
 
 				// Transform user entity (remove password and all protected fields)
 				const doc = await this.transformDocuments(ctx, {}, user);
@@ -254,10 +254,12 @@ module.exports = {
 					if (found && found._id.toString() !== ctx.meta.user1._id.toString())
 						throw new MoleculerClientError("Email is exist!", 422, "", [{ field: "email", message: "is exist" }]);
 				}
+				if (newData.password) newData.password = bcrypt.hashSync(newData.password, 10);
 				newData.updatedAt = new Date();
 				const update = {
 					"$set": newData
 				};
+				console.log(newData);
 				const doc = await this.adapter.updateById(ctx.meta.user1._id, update);
 
 				const user = await this.transformDocuments(ctx, {}, doc);
@@ -317,7 +319,6 @@ module.exports = {
 				return doc;
 			}
 		},
-
 		registerwithtoken: {
 			rest: "POST /regtoken",
 			params: {
@@ -360,7 +361,74 @@ module.exports = {
 				}
 
 			}
-		}
+		},
+		/**
+		 * Login with username & password
+		 *
+		 * @actions
+		 * @param {Object} user - User credentials
+		 *
+		 * @returns {Object} Logged in user with token
+		 */
+		forgetPassword: {
+			rest: "POST /forgetpassword",
+			params: {
+				email: { type: "email" },
+			},
+			async handler(ctx) {
+				const email = ctx.params.email;
+
+				const user = await this.adapter.findOne({ email });
+				if (!user)
+					throw new MoleculerClientError("Email is invalid!", 422, "", [{ field: "email", message: "is not found" }]);
+				//HAsh payload with secret and nbf and iat
+				let payload = jwt.sign({
+					id: user._id,
+					username: user.username,
+					exp: Math.floor((Date.now() / 1000) + (60 * 30))
+				}, this.settings.JWT_SECRET);
+				//send to mail
+				return { payload }
+			}
+		},
+		verifyPasswordToken: {
+			rest: "POST /verify",
+			params: {
+				token: { type: "string" },
+			},
+			async handler(ctx) {
+				const token = ctx.params.token;
+
+				let user = await ctx.call("users.resolveToken", { token });
+				if (!user)
+					throw new MoleculerClientError("token is invalid!", 422, "", [{ field: "token", message: "is invalid" }]);
+				if (user.exp < (Date.now() / 1000))
+					throw new MoleculerClientError("token has expired", 422, "", [{ field: "token", message: "expired" }]);
+
+				return { status: true }
+			}
+		},
+		changePassword: {
+			rest: "POST /resetpassword",
+			params: {
+				token: { type: "string", min: 20 },
+				password: { type: "string", min: 5 }
+
+			},
+			async handler(ctx) {
+				const token = ctx.params.token;
+				const password = ctx.params.password;
+
+				let user = await ctx.call("users.resolveToken", { token });
+				if (!user)
+					throw new MoleculerClientError("token is invalid!", 422, "", [{ field: "token", message: "is invalid" }]);
+				if (user.exp < (Date.now() / 1000))
+					throw new MoleculerClientError("token has expired", 422, "", [{ field: "token", message: "expired" }]);
+				ctx.meta.user1 = user;
+				return await ctx.call("users.updateMyself", { user: { password } })
+			}
+		},
+
 
 	},
 
@@ -384,7 +452,6 @@ module.exports = {
 				exp: Math.floor(exp.getTime() / 1000)
 			}, this.settings.JWT_SECRET);
 		},
-
 		/**
 		 * Transform returned user entity. Generate JWT token if neccessary.
 		 *
