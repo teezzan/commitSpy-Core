@@ -388,7 +388,7 @@ module.exports = {
 					exp: Math.floor((Date.now() / 1000) + (60 * 30))
 				}, this.settings.JWT_SECRET);
 				//send to mail
-				return { payload }
+				return { payload, status: true }
 			}
 		},
 		verifyPasswordToken: {

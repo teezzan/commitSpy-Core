@@ -6,11 +6,74 @@ const DbService = require("moleculer-db");
 const MongooseAdapter = require("moleculer-db-adapter-mongoose");
 const Account = require("../models/account.model");
 let axios = require('axios');
+let crypto = require('crypto');
+
 module.exports = {
 	name: "payment",
 	mixins: [
 		DbService
 	],
+	// More info about settings: https://moleculer.services/docs/0.14/moleculer-web.html
+	settings: {
+		routes: [
+			{
+				path: "/",
+				/**
+				 * Before call hook. You can check the request.
+				 * @param {Context} ctx
+				 * @param {Object} route
+				 * @param {IncomingRequest} req
+				 * @param {ServerResponse} res
+				 * @param {Object} data
+				 *
+				 */
+				onBeforeCall(ctx, route, req, res) {
+					// Set request headers to context meta
+					// ctx.meta.userAgent = req.headers["user-agent"];
+					var hash = crypto.createHmac('sha512', process.env.PAYSTACK_PRIVATE_KEY).update(JSON.stringify(req.body)).digest('hex');
+					if (hash == req.headers["x-paystack-signature"]) {
+						ctx.meta.validation = true;
+						ctx.meta.paystackHmac = hash;
+						ctx.meta.paystackSignature = req.headers["x-paystack-signature"];
+
+					} else {
+						ctx.meta.validation = false;
+						ctx.meta.paystackHmac = hash;
+						ctx.meta.paystackSignature = req.headers["x-paystack-signature"];
+					}
+
+				},
+				/**
+				 * After call hook. You can modify the data.
+				 * @param {Context} ctx
+				 * @param {Object} route
+				 * @param {IncomingRequest} req
+				 * @param {ServerResponse} res
+				 * @param {Object} data
+				onAfterCall(ctx, route, req, res, data) {
+					// Async function which return with Promise
+					return doSomething(ctx, res, data);
+				}, */
+
+			}
+		],
+
+		// Do not log client side errors (does not log an error response when the error.code is 400<=X<500)
+		log4XXResponses: false,
+		// Logging the request parameters. Set to any log level to enable it. E.g. "info"
+		logRequestParams: null,
+		// Logging the response data. Set to any log level to enable it. E.g. "info"
+		logResponseData: null,
+
+
+		// Serve assets from "public" folder. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Serve-static-files
+		assets: {
+			folder: "public",
+
+			// Options to `server-static` module
+			options: {}
+		}
+	},
 	adapter: new MongooseAdapter(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true }),
 	model: Account,
 	async started() {
@@ -114,6 +177,38 @@ module.exports = {
 						} else {
 							return { status: false, message: "Payment server unavailable" }
 						}
+
+					}
+					else {
+						throw new MoleculerClientError("Payment Details Error!", 422, "", [{ field: "Failure", message: " Check Details. Amount must be greater than 0" }]);
+
+					}
+
+
+
+
+				}
+				catch (err) {
+					console.log(err)
+					throw new MoleculerClientError("Payment Error!", 500, "", [{ field: "Failure", message: " Internal Failure" }]);
+
+				}
+			}
+		},
+		paymentHook: {
+			rest: "GET /hook",
+			params: {
+				data: { type: "object" },
+				event: { type: "string" }
+			},
+			async handler(ctx) {
+
+				try {
+					let currency = ['USD', 'NGN', 'GHS'];
+					const event = ctx.params.event;
+					const data = ctx.params.data;
+					if (event == 'charge.success') {
+
 
 					}
 					else {
