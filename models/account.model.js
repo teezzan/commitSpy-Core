@@ -10,7 +10,7 @@ let AccountSchema = new Schema({
 		required: "Please fill in title",
 		unique: true
 	},
-	uniy: {
+	unit: {
 		type: String,
 		"default": "$"
 	},

@@ -1,7 +1,8 @@
 "use strict";
 
 const ApiGateway = require("moleculer-web");
-const _ = require('lodash')
+const _ = require('lodash');
+let crypto = require('crypto');
 
 /**
  * @typedef {import('moleculer').Context} Context Moleculer's Context
@@ -80,11 +81,22 @@ module.exports = {
 				 * @param {IncomingRequest} req
 				 * @param {ServerResponse} res
 				 * @param {Object} data
-				 *
+				 **/
 				onBeforeCall(ctx, route, req, res) {
 					// Set request headers to context meta
-					ctx.meta.userAgent = req.headers["user-agent"];
-				}, */
+					if (req.headers["x-paystack-signature"]) {
+						var hash = crypto.createHmac('sha512', process.env.PAYSTACK_PRIVATE_KEY).update(JSON.stringify(req.body)).digest('hex');
+						if (hash == req.headers["x-paystack-signature"]) {
+							ctx.meta.validation = true;
+							ctx.meta.paystackHmac = hash;
+							ctx.meta.paystackSignature = req.headers["x-paystack-signature"];
+						} else {
+							ctx.meta.validation = false;
+							ctx.meta.paystackHmac = hash;
+							ctx.meta.paystackSignature = req.headers["x-paystack-signature"];
+						}
+					}
+				},
 
 				/**
 				 * After call hook. You can modify the data.
@@ -118,6 +130,7 @@ module.exports = {
 				// Enable/disable logging
 				logging: true
 			}
+
 		],
 
 		// Do not log client side errors (does not log an error response when the error.code is 400<=X<500)

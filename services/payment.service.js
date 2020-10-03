@@ -10,71 +10,13 @@ let crypto = require('crypto');
 
 module.exports = {
 	name: "payment",
+
 	mixins: [
 		DbService
 	],
-	// More info about settings: https://moleculer.services/docs/0.14/moleculer-web.html
-	settings: {
-		routes: [
-			{
-				path: "/",
-				/**
-				 * Before call hook. You can check the request.
-				 * @param {Context} ctx
-				 * @param {Object} route
-				 * @param {IncomingRequest} req
-				 * @param {ServerResponse} res
-				 * @param {Object} data
-				 *
-				 */
-				onBeforeCall(ctx, route, req, res) {
-					// Set request headers to context meta
-					// ctx.meta.userAgent = req.headers["user-agent"];
-					var hash = crypto.createHmac('sha512', process.env.PAYSTACK_PRIVATE_KEY).update(JSON.stringify(req.body)).digest('hex');
-					if (hash == req.headers["x-paystack-signature"]) {
-						ctx.meta.validation = true;
-						ctx.meta.paystackHmac = hash;
-						ctx.meta.paystackSignature = req.headers["x-paystack-signature"];
-					} else {
-						ctx.meta.validation = false;
-						ctx.meta.paystackHmac = hash;
-						ctx.meta.paystackSignature = req.headers["x-paystack-signature"];
-					}
-
-				},
-				/**
-				 * After call hook. You can modify the data.
-				 * @param {Context} ctx
-				 * @param {Object} route
-				 * @param {IncomingRequest} req
-				 * @param {ServerResponse} res
-				 * @param {Object} data
-				onAfterCall(ctx, route, req, res, data) {
-					// Async function which return with Promise
-					return doSomething(ctx, res, data);
-				}, */
-
-			}
-		],
-
-		// Do not log client side errors (does not log an error response when the error.code is 400<=X<500)
-		log4XXResponses: false,
-		// Logging the request parameters. Set to any log level to enable it. E.g. "info"
-		logRequestParams: null,
-		// Logging the response data. Set to any log level to enable it. E.g. "info"
-		logResponseData: null,
-
-
-		// Serve assets from "public" folder. More info: https://moleculer.services/docs/0.14/moleculer-web.html#Serve-static-files
-		assets: {
-			folder: "public",
-
-			// Options to `server-static` module
-			options: {}
-		}
-	},
 	adapter: new MongooseAdapter(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true }),
 	model: Account,
+
 	async started() {
 
 		try {
@@ -118,7 +60,7 @@ module.exports = {
 						let project = entity[i];
 						//update project
 						let res = await ctx.call("project.addDeductHistory", { payload: { _id: project._id, amount: 1 } })
-						let user = await ctx.call("users.deductWallet", { payload: { _id: project.author._id, cost: 1 } });
+						let user = await ctx.call("users.deductWallet", { payload: { _id: project.author._id, cost: -1 } });
 
 						let updated = await this.adapter.updateById(account._id, {
 							$set: {
@@ -195,7 +137,7 @@ module.exports = {
 			}
 		},
 		paymentHook: {
-			rest: "GET /hook",
+			rest: "POST /hook",
 			params: {
 				data: { type: "object" },
 				event: { type: "string" }
@@ -203,16 +145,38 @@ module.exports = {
 			async handler(ctx) {
 
 				try {
-					let currency = ['USD', 'NGN', 'GHS'];
+					console.log("Payment Hook begins")
 					const event = ctx.params.event;
 					const data = ctx.params.data;
-					if (event == 'charge.success') {
-						return { status: 200 }
+					console.log(ctx.meta);
+					if (ctx.meta.validation && event == 'charge.success') {
+						let reference = data.reference;
+						let id = reference.split('==')[0];
+						let amount = data.amount / 100;
+						const account = await this.adapter.findOne({ name: 'Main' });
+						let updated = await this.adapter.updateById(account._id, {
+							$set: {
+								updatedAt: new Date()
+							},
+							$push: {
+								ingress: {
+									amount,
+									date: new Date(),
+									author: id
+								}
+							},
+							$inc: {
+								totalIngress: amount
+							}
+						});
+
+						let user = await ctx.call("users.deductWallet", { payload: { _id: id, cost: amount } });
+						console.log({ amount, id, user });
+						return { status: 200 };
 
 					}
 					else {
-						throw new MoleculerClientError("Payment Details Error!", 422, "", [{ field: "Failure", message: " Check Details. Amount must be greater than 0" }]);
-
+						return { status: 200 };
 					}
 
 
@@ -221,7 +185,7 @@ module.exports = {
 				}
 				catch (err) {
 					console.log(err)
-					throw new MoleculerClientError("Payment Error!", 500, "", [{ field: "Failure", message: " Internal Failure" }]);
+					return { status: 200 };
 
 				}
 			}

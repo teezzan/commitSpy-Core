@@ -275,7 +275,7 @@ module.exports = {
 			async handler(ctx) {
 				try {
 					const payload = ctx.params.payload;
-					let user = this.adapter.updateById(payload._id, { $inc: { wallet: -payload.cost } });
+					let user = this.adapter.updateById(payload._id, { $inc: { wallet: payload.cost } });
 					return user
 				} catch (err) {
 					console.log(err);
