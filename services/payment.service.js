@@ -35,7 +35,6 @@ module.exports = {
 						ctx.meta.validation = true;
 						ctx.meta.paystackHmac = hash;
 						ctx.meta.paystackSignature = req.headers["x-paystack-signature"];
-
 					} else {
 						ctx.meta.validation = false;
 						ctx.meta.paystackHmac = hash;
@@ -208,7 +207,7 @@ module.exports = {
 					const event = ctx.params.event;
 					const data = ctx.params.data;
 					if (event == 'charge.success') {
-
+						return { status: 200 }
 
 					}
 					else {
