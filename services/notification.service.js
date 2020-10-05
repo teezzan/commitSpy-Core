@@ -192,6 +192,7 @@ module.exports = {
 			async handler(ctx) {
 				try {
 					let entity = ctx.params.user;
+					console.log(user);
 					//compose mail
 					let html = await this.composePassMail({ username: entity.username, url: entity.url });
 					let msg = {
@@ -201,7 +202,7 @@ module.exports = {
 						text: 'Confirmation.',
 						html
 					};
-					sgMail.send(msg).then(res => {
+					sgMail.send([msg]).then(res => {
 						console.log("Success =>");
 						return { status: "successs", msg }
 					})
