@@ -195,9 +195,9 @@ module.exports = {
 					//compose mail
 					let html = await this.composePassMail({ username: entity.username, url: entity.url });
 					let msg = {
-						to: `${project.author.email}`,
+						to: `${entity.email}`,
 						from: 'taiwo@skrypt.com.ng',
-						subject: 'Password reset',
+						subject: 'Password Reset',
 						text: 'Confirmation.',
 						html
 					};
