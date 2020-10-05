@@ -171,7 +171,7 @@ module.exports = {
 						});
 
 						let user = await ctx.call("users.deductWallet", { payload: { _id: id, cost: amount } });
-						console.log({ amount, id, user });
+						// console.log({ amount, id, user });
 						return { status: 200 };
 
 					}

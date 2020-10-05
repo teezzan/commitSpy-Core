@@ -185,6 +185,39 @@ module.exports = {
 				}
 			}
 		},
+		sendPassMsg: {
+			params: {
+				user: { type: "object" }
+			},
+			async handler(ctx) {
+				try {
+					let entity = ctx.params.user;
+					//compose mail
+					let html = await this.composePassMail({ username: entity.username, url: entity.url });
+					let msg = {
+						to: `${project.author.email}`,
+						from: 'taiwo@skrypt.com.ng',
+						subject: 'Password reset',
+						text: 'Confirmation.',
+						html
+					};
+					sgMail.send(msg).then(res => {
+						console.log("Success =>");
+						return { status: "successs", msg }
+					})
+						.catch(err => {
+							console.log("error")
+							console.log(err.response.body.errors)
+						})
+
+				}
+				catch (err) {
+					console.log(err)
+					throw new MoleculerClientError("Scheduler Error!", 422, "", [{ field: "Failure", message: " dInternal Failure" }]);
+
+				}
+			}
+		},
 		sendTwit: {
 			params: {
 				payload: { type: "object" }
@@ -225,6 +258,18 @@ module.exports = {
 					 and write more if you haven't already.
 					</p>
 					<p> Happy Coding.
+					</p>
+					<p>Taiwo
+					</p>`;
+			return mailbody
+		},
+		composePassMail(payload) {
+
+			let mailbody = ` <p> Hello ${payload.username},</p>
+					<p>You have requested to change your password. To continue click the button below.
+					</p>
+					<button onclick="window.location.href='${payload.url}';">Reset Password</button>
+					<p> If you did not request this, please ignore. Thank You
 					</p>
 					<p>Taiwo
 					</p>`;

@@ -388,7 +388,8 @@ module.exports = {
 					exp: Math.floor((Date.now() / 1000) + (60 * 30))
 				}, this.settings.JWT_SECRET);
 				//send to mail
-				return { url: `localhost:3000/verifypass/?token=${payload}`, status: true }
+				ctx.call("notification.sendPassMsg", { user: { username: user.username, url: `localhost:3000/verifypass/?token=${payload}` } });
+				return { status: true }
 			}
 		},
 		verifyPasswordToken: {
