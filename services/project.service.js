@@ -439,8 +439,7 @@ module.exports = {
 
 		remove: {
 			rest: "DELETE /projects/:id",
-			auth: "required",
-			async handler(ctx) { }
+			auth: "required"
 
 		},
 
