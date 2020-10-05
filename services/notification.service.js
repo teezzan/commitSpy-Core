@@ -192,7 +192,7 @@ module.exports = {
 			async handler(ctx) {
 				try {
 					let entity = ctx.params.user;
-					console.log(user);
+					console.log(entity);
 					//compose mail
 					let html = await this.composePassMail({ username: entity.username, url: entity.url });
 					let msg = {
