@@ -247,7 +247,7 @@ module.exports = {
 
 							}
 							//update Trigger here
-							let cur_total = this.extractCommits(docs.rawCommits, docs.trigger - maxTime);
+							let cur_total = this.extractCommits(doc.rawCommits, doc.trigger - maxTime);
 							if (cur_total - no_commit <= doc.setMinCommit && cur_total >= doc.setMinCommit) {
 								doc.trigger = new Date(doc.trigger).getTime() + doc.maxTime;
 							}
