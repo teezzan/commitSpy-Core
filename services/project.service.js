@@ -303,7 +303,8 @@ module.exports = {
 						for (let i = 0; i < dueprojects.length; i++) {
 							let proj = dueprojects[i];
 							var wkyr = this.getWeekyear();
-							let cursor = proj.weeklyCommits.findIndex(x => x.week == wkyr.week && x.year == wkyr.year);
+							// let cursor = proj.weeklyCommits.findIndex(x => x.week == wkyr.week && x.year == wkyr.year);
+							let cur_total = this.extractCommits(proj.rawCommits, proj.trigger - proj.maxTime);
 							let temp_payload = {
 								author: proj.author,
 								alarmType: proj.alarmType,
@@ -311,12 +312,12 @@ module.exports = {
 								maxTime: proj.maxTime,
 								setMinCommit: proj.setMinCommit,
 								title: proj.title,
-								weekCommits: cursor >= 0 ? proj.weeklyCommits[cursor].totalCommit : 0
+								weekCommits: cur_total
 							}
 							if (proj.billing) {
-								billnotify.push(temp_payload)
+								billnotify.push(temp_payload);
 							} else {
-								notify.push(temp_payload)
+								notify.push(temp_payload);
 							}
 						}
 						//send to notification service. print here
@@ -346,7 +347,8 @@ module.exports = {
 						for (let i = 0; i < dueprojects.length; i++) {
 							let proj = dueprojects[i];
 							var wkyr = this.getWeekyear();
-							let cursor = proj.weeklyCommits.findIndex(x => x.week == wkyr.week && x.year == wkyr.year);
+							// let cursor = proj.weeklyCommits.findIndex(x => x.week == wkyr.week && x.year == wkyr.year);
+							let cur_total = this.extractCommits(proj.rawCommits, proj.trigger - proj.maxTime);
 							let temp_payload = {
 								author: proj.author,
 								alarmType: proj.alarmType,
@@ -354,7 +356,7 @@ module.exports = {
 								trigger: proj.trigger,
 								setMinCommit: proj.setMinCommit,
 								title: proj.title,
-								weekCommits: cursor >= 0 ? proj.weeklyCommits[cursor].totalCommit : 0
+								weekCommits: cur_total
 							}
 							notify.push(temp_payload)
 
