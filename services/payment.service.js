@@ -88,7 +88,7 @@ module.exports = {
 		},
 		acceptPayment: {
 			auth: "required",
-			rest: "GET /init",
+			rest: "POST /init",
 			params: {
 				payment: { type: "object" }
 			},
