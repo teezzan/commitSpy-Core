@@ -102,7 +102,8 @@ module.exports = {
 							email: ctx.meta.user1.email,
 							amount: payment.amount,
 							reference: `${ctx.meta.user1._id}==${Date.now()}`,
-							currency: payment.currency
+							currency: payment.currency,
+							callback_url: "localhost:3000/home"
 						}
 						let res = await axios.post('https://api.paystack.co/transaction/initialize', payload, {
 							headers: {
@@ -145,7 +146,8 @@ module.exports = {
 			async handler(ctx) {
 
 				try {
-					console.log("Payment Hook begins")
+					console.log("Payment Hook begins");
+					console.log(data);
 					const event = ctx.params.event;
 					const data = ctx.params.data;
 					console.log(ctx.meta);
