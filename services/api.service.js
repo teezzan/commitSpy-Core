@@ -87,10 +87,12 @@ module.exports = {
 					if (req.headers["x-paystack-signature"]) {
 						var hash = crypto.createHmac('sha512', process.env.PAYSTACK_PRIVATE_KEY).update(JSON.stringify(req.body)).digest('hex');
 						if (hash == req.headers["x-paystack-signature"]) {
+							console.log("matches the needed")
 							ctx.meta.validation = true;
 							ctx.meta.paystackHmac = hash;
 							ctx.meta.paystackSignature = req.headers["x-paystack-signature"];
 						} else {
+							console.log("Not verified")
 							ctx.meta.validation = false;
 							ctx.meta.paystackHmac = hash;
 							ctx.meta.paystackSignature = req.headers["x-paystack-signature"];

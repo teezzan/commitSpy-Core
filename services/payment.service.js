@@ -147,9 +147,9 @@ module.exports = {
 
 				try {
 					console.log("Payment Hook begins");
-					console.log(data);
 					const event = ctx.params.event;
 					const data = ctx.params.data;
+					console.log(data);
 					console.log(ctx.meta);
 					if (ctx.meta.validation && event == 'charge.success') {
 						let reference = data.reference;
