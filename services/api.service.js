@@ -45,8 +45,8 @@ module.exports = {
 				path: "/api",
 
 				cors: {
-					origin: ["http://localhost:3000", "https://localhost:4000"],
-					methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
+					origin: ["*"],
+					methods: ["*"],
 					credentials: true
 				},
 
