@@ -269,7 +269,7 @@ module.exports = {
 			let mailbody = ` <p> Hello ${payload.username},</p>
 					<p>You have requested to change your password. To continue click the button below.
 					</p>
-					<button onclick="window.location.href='${payload.url}';">Reset Password</button>
+					<a href="${payload.url}"><button>Reset Password</button></a>
 					<p> If you did not request this, please ignore. Thank You
 					</p>
 					<p>Taiwo
