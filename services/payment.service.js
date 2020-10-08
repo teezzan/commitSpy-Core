@@ -146,10 +146,10 @@ module.exports = {
 			async handler(ctx) {
 
 				try {
-					console.log("Payment Hook begins");
+					// console.log("Payment Hook begins");
 					const event = ctx.params.event;
 					const data = ctx.params.data;
-					console.log(data);
+					// console.log(data);
 					console.log(ctx.meta);
 					if (ctx.meta.validation && event == 'charge.success') {
 						let reference = data.reference;
