@@ -348,9 +348,17 @@ module.exports = {
 						avatar: data.avatar_url,
 						twitter: data.twitter_username
 					}
-					console.log("user is =", user)
-					console.log("creating user ")
-					let a = await ctx.call("users.create", { user })
+					console.log("user is =", user);
+					console.log("creating user ");
+					const found = await this.adapter.findOne({ git_id: data.id });
+					let a = null;
+					if (!found) {
+						a = await ctx.call("users.create", { user });
+					}
+					else {
+						// a = await ctx.call("users.create", { user:{email: found.email, } });
+						throw new MoleculerClientError("Github Account has been Registered Exists", 422);
+					}
 
 					return a
 

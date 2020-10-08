@@ -111,7 +111,6 @@ module.exports = {
 								'Content-Type': 'application/json'
 							}
 						})
-						// return res.data
 						if (res.data.status) {
 							let data = res.data.data;
 							return { authorization_url: data.authorization_url };
