@@ -386,9 +386,12 @@ module.exports = {
 					let a = null;
 					if (!found) {
 						a = await ctx.call("users.create", { user });
+						a = { ...a, state: "reg" }
 					}
 					else {
 						a = await ctx.call("users.create", { git_id: user.git_id });
+						a = { ...a, state: "login" }
+
 					}
 
 					return a
