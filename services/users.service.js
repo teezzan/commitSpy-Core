@@ -314,11 +314,11 @@ module.exports = {
 		registerwithtoken: {
 			rest: "POST /regtoken",
 			params: {
-				password: { type: "string", min: 6 },
 				access_token: { type: "string", min: 6 },
 				scope: { type: "string" },
 				token_type: { type: "string" },
-				email: { type: "string" }
+				password: { type: "string", min: 6, optional: true },
+				email: { type: "string", optional: true }
 
 			},
 			async handler(ctx) {
@@ -341,14 +341,15 @@ module.exports = {
 						}
 					})
 					let data2 = res2.data;
+					let email = data2[data2.findIndex(x => x.primary == true && x.verified == true)];
 
-					console.log("data2 ", data2);
+					// console.log("data2 ", data2);
 
 					let user = {
-						email: ctx.params.email,
+						email: email,
 						git_id: `${data.id}`,
 						username: data.login,
-						password: ctx.params.password,
+						password: process.env.DEFAULT_PASSWORD,
 						avatar: data.avatar_url,
 						twitter: data.twitter_username
 					}
