@@ -141,22 +141,23 @@ module.exports = {
 		loginGithub: {
 			rest: "POST /logingithub",
 			params: {
-				access_token: { type: "string", min: 6 },
-				scope: { type: "string" },
-				token_type: { type: "string" },
+				git_id: { type: "string", min: 2 },
+				access_token: { type: "string", min: 6, optional: true },
+				scope: { type: "string", optional: true },
+				token_type: { type: "string", optional: true },
 			},
 			async handler(ctx) {
 
-				let res = await axios.get('https://api.github.com/user', {
-					params: {
-						access_token: ctx.params.access_token,
-						token_type: ctx.params.token_type,
-						scope: ctx.params.scope
-					}
-				})
-				let data = res.data;
+				// let res = await axios.get('https://api.github.com/user', {
+				// 	params: {
+				// 		access_token: ctx.params.access_token,
+				// 		token_type: ctx.params.token_type,
+				// 		scope: ctx.params.scope
+				// 	}
+				// })
+				// let data = res.data;
 
-				const user = await this.adapter.findOne({ git_id: `${data.id}` });
+				const user = await this.adapter.findOne({ git_id: ctx.params.git_id });
 				if (!user)
 					throw new MoleculerClientError("Email is invalid!", 422, "", [{ field: "email", message: "is not found" }]);
 
@@ -387,8 +388,7 @@ module.exports = {
 						a = await ctx.call("users.create", { user });
 					}
 					else {
-						// a = await ctx.call("users.create", { user:{email: found.email, } });
-						throw new MoleculerClientError("Github Account has been Registered Exists", 422);
+						a = await ctx.call("users.create", { git_id: user.git_id });
 					}
 
 					return a
