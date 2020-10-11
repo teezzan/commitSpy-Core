@@ -34,7 +34,7 @@ module.exports = {
 		/** REST Basepath */
 		rest: "/users",
 		/** Secret for JWT */
-		JWT_SECRET: process.env.JWT_SECRET || "jwt-conduit-secret",
+		JWT_SECRET: process.env.JWT_SECRET || "jwt-conduit-secret-test",
 
 		/** Public fields */
 		fields: ["_id", "username", "git_id", "email", "twitter", "avatar", "wallet"],
@@ -386,11 +386,11 @@ module.exports = {
 					let a = null;
 					if (!found) {
 						a = await ctx.call("users.create", { user });
-						a = { ...a, state: "reg" }
+						a = { ...a, state: "reg" };
 					}
 					else {
-						a = await ctx.call("users.create", { git_id: user.git_id });
-						a = { ...a, state: "login" }
+						a = await ctx.call("users.loginGithub", { git_id: user.git_id });
+						a = { ...a, state: "login" };
 
 					}
 
