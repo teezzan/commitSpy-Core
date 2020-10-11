@@ -297,14 +297,6 @@ module.exports = {
 		remove: {
 			// rest: "DELETE /users/:id"
 		},
-		/**
-		 * Get a user profile.
-		 *
-		 * @actions
-		 *
-		 * @param {String} _id - id
-		 * @returns {Object} User entity
-		 */
 		getbygitID: {
 
 			params: {
@@ -370,14 +362,6 @@ module.exports = {
 
 			}
 		},
-		/**
-		 * Login with username & password
-		 *
-		 * @actions
-		 * @param {Object} user - User credentials
-		 *
-		 * @returns {Object} Logged in user with token
-		 */
 		forgetPassword: {
 			rest: "POST /forgetpassword",
 			params: {
