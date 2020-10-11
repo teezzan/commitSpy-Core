@@ -118,7 +118,7 @@ module.exports = {
 				user: {
 					type: "object", props: {
 						email: { type: "email" },
-						password: { type: "string", min: 1 }
+						password: { type: "string", min: 6 }
 					}
 				}
 			},
@@ -138,7 +138,33 @@ module.exports = {
 				return await this.transformEntity(doc, true, ctx.meta.token);
 			}
 		},
+		loginGithub: {
+			rest: "POST /logingithub",
+			params: {
+				access_token: { type: "string", min: 6 },
+				scope: { type: "string" },
+				token_type: { type: "string" },
+			},
+			async handler(ctx) {
 
+				let res = await axios.get('https://api.github.com/user', {
+					params: {
+						access_token: ctx.params.access_token,
+						token_type: ctx.params.token_type,
+						scope: ctx.params.scope
+					}
+				})
+				let data = res.data;
+
+				const user = await this.adapter.findOne({ git_id: `${data.id}` });
+				if (!user)
+					throw new MoleculerClientError("Email is invalid!", 422, "", [{ field: "email", message: "is not found" }]);
+
+				// Transform user entity (remove password and all protected fields)
+				const doc = await this.transformDocuments(ctx, {}, user);
+				return await this.transformEntity(doc, true, ctx.meta.token);
+			}
+		},
 		/**
 		 * Get user by JWT token (for API GW authentication)
 		 *
