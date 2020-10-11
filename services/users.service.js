@@ -332,6 +332,18 @@ module.exports = {
 						}
 					})
 					let data = res.data;
+
+					let res2 = await axios.get('https://api.github.com/user/emails', {
+						params: {
+							access_token: ctx.params.access_token,
+							token_type: ctx.params.token_type,
+							scope: ctx.params.scope
+						}
+					})
+					let data2 = res2.data;
+
+					console.log("data2 ", data2);
+
 					let user = {
 						email: ctx.params.email,
 						git_id: `${data.id}`,
