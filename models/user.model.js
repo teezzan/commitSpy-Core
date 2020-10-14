@@ -48,6 +48,18 @@ let UserSchema = new Schema({
 	wallet: {
 		type: Number,
 		"default": 0.00
+	},
+	streak: {
+		type: Number,
+		"default": 0
+	},
+	longest_streak: {
+		type: Number,
+		"default": 0
+	},
+	total_hits: {
+		type: Number,
+		"default": 0
 	}
 }, {
 	timestamps: true

@@ -242,15 +242,18 @@ module.exports = {
 								doc.weeklyCommits.push(temp);
 
 							} else {
-								let prevreading = doc.weeklyCommits[cursor].totalCommit;
 								doc.weeklyCommits[cursor].totalCommit = doc.weeklyCommits[cursor].totalCommit + no_commit;
-
 							}
 							//update Trigger here
 							let cur_total = this.extractCommits(doc.rawCommits, doc.trigger - doc.maxTime);
 							if (cur_total - no_commit <= doc.setMinCommit && cur_total >= doc.setMinCommit) {
 								doc.trigger = new Date(doc.trigger).getTime() + doc.maxTime;
+								//increment streak.
+								ctx.call("users.incrementStreak", { payload: { _id: user._id } });
+
 							}
+							//increment user total hit.
+							ctx.call("users.incrementHit", { payload: { _id: user._id, hit: no_commit } });
 
 
 							//"trigger": "2020-08-29T20:59:55.029Z",
@@ -385,11 +388,10 @@ module.exports = {
 					let entity = ctx.params.projects;
 					for (let i = 0; i < entity.length; i++) {
 						let project = entity[i];
-						// console.log(project.title)
+						ctx.call("users.resetStreak", { payload: { _id: project.author._id } });
 						let updated = await this.adapter.updateById(project._id, {
 							$set: {
 								trigger: Date.now() + project.maxTime,
-								// sessionCommit = 0,
 								updatedAt: new Date()
 							}//add the amount...
 						})

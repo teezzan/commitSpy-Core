@@ -37,7 +37,7 @@ module.exports = {
 		JWT_SECRET: process.env.JWT_SECRET || "jwt-conduit-secret-test",
 
 		/** Public fields */
-		fields: ["_id", "username", "git_id", "email", "twitter", "avatar", "wallet"],
+		fields: ["_id", "username", "git_id", "email", "twitter", "avatar", "wallet", "streak", "longest_streak", "total_hits"],
 
 		/** Validator schema for entity */
 		/**
@@ -304,6 +304,57 @@ module.exports = {
 					const payload = ctx.params.payload;
 					let user = this.adapter.updateById(payload._id, { $inc: { wallet: payload.cost } });
 					return user
+				} catch (err) {
+					console.log(err);
+					throw new MoleculerClientError("Internal Error!", 500, "", [{ field: "Failure", message: " Internal Failure" }]);
+				}
+			}
+		},
+		incrementHit: {
+			params: {
+				payload: { type: "object" }
+			},
+			async handler(ctx) {
+				try {
+					const payload = ctx.params.payload;
+					let user = this.adapter.updateById(payload._id, { $inc: { total_hits: payload.hit } });
+					return user
+				} catch (err) {
+					console.log(err);
+					throw new MoleculerClientError("Internal Error!", 500, "", [{ field: "Failure", message: " Internal Failure" }]);
+				}
+			}
+		},
+		incrementStreak: {
+			params: {
+				payload: { type: "object" }
+			},
+			async handler(ctx) {
+				try {
+					const payload = ctx.params.payload;
+					const user = await this.getById(payload._id);
+					let up_user
+					let new_streak = user.streak + 1;
+					if (new_streak > user.streak) {
+						up_user = this.adapter.updateById(payload._id, { $inc: { streak: 1, longest_streak: 1 } });
+					} else {
+						up_user = this.adapter.updateById(payload._id, { $inc: { streak: 1 } });
+					}
+					return up_user
+				} catch (err) {
+					console.log(err);
+					throw new MoleculerClientError("Internal Error!", 500, "", [{ field: "Failure", message: " Internal Failure" }]);
+				}
+			}
+		},
+		resetStreak: {
+			params: {
+				payload: { type: "object" }
+			},
+			async handler(ctx) {
+				try {
+					let up_user = this.adapter.updateById(payload._id, { $set: { streak: 0 } });
+					return up_user
 				} catch (err) {
 					console.log(err);
 					throw new MoleculerClientError("Internal Error!", 500, "", [{ field: "Failure", message: " Internal Failure" }]);
