@@ -39,12 +39,12 @@ module.exports = {
 			git_id: { type: "string", min: 2 },
 			setMinCommit: { type: "number", optional: true },
 			maxTime: { type: "number", optional: true },
-			author: { type: "string", optional: true },
-			trigger: { type: "string", optional: true },
+			// author: { type: "string", min: 7 },
+			// trigger: { type: "string", optional: true },
 			alarmType: { type: "number", optional: true },
 			billing: { type: "boolean", optional: true },
-			weeklyCommits: { type: "array", optional: true },
-			commitBills: { type: "array", optional: true },
+			// weeklyCommits: { type: "array", optional: true },
+			// commitBills: { type: "array", optional: true },
 
 		},
 
@@ -81,13 +81,16 @@ module.exports = {
 				// console.log(entity);
 				await this.validateEntity(entity);
 				if (entity.title) {
-					const found = await this.adapter.findOne({ title: entity.title });
+					const found = await this.adapter.findOne({ title: entity.title, author: ctx.meta.user1._id });
 					if (found)
 						throw new MoleculerClientError("Title exist!", 422, "", [{ field: "title", message: "is exist" }]);
 				}
 				//
 
 				entity.author = ctx.meta.user1._id;
+				if (entity.author == undefined)
+					throw new MoleculerClientError("Author Not Found!", 422, "", [{ field: "author", message: "is undefined" }]);
+
 				entity.createdAt = new Date();
 				if (entity.alarmType && entity.alarmType > 2) {
 					entity.alarmType = 0
