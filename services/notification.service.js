@@ -97,6 +97,8 @@ module.exports = {
 			},
 			async handler(ctx) {
 				let mailpayload = [];
+				console.log("entered unpaid alert")
+
 				try {
 					console.log("sending unpaid alert")
 
