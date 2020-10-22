@@ -1,7 +1,6 @@
 "use strict";
 
 const { MoleculerClientError } = require("moleculer").Errors;
-// const CacheCleanerMixin = require("../mixins/cache.cleaner.mixin");
 const DbService = require("moleculer-db");
 const MongooseAdapter = require("moleculer-db-adapter-mongoose");
 const Account = require("../models/account.model");

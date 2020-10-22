@@ -5,7 +5,6 @@ const { MoleculerClientError } = require("moleculer").Errors;
 const DbService = require("moleculer-db");
 const MongooseAdapter = require("moleculer-db-adapter-mongoose");
 const Project = require("../models/project.model");
-// const CacheCleanerMixin = require("../mixins/cache.cleaner.mixin");
 
 module.exports = {
 	name: "project",
