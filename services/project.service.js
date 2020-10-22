@@ -323,6 +323,7 @@ module.exports = {
 								notify.push(temp_payload);
 							}
 						}
+						console.log({ notify, billnotify })
 						//send to notification service. print here
 						let paidnotification = await ctx.call("notification.sendPaidAlert", { projects: billnotify });
 						//call payment service.
