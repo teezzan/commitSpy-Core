@@ -135,6 +135,7 @@ module.exports = {
 					// 		console.log(err.response.body.errors)
 					// 	})
 					console.log("clearing alert temporarily");
+					//find alternative to sendgrid
 					let clear = ctx.call("project.clearAlert", { projects: entity });
 
 				}
