@@ -131,6 +131,8 @@ module.exports = {
 					})
 						.catch(err => {
 							console.log("error")
+							let clear = ctx.call("project.clearAlert", { projects: entity });
+
 							console.log(err.response.body.errors)
 						})
 
