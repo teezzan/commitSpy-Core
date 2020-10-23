@@ -1,6 +1,7 @@
 "use strict";
 
 const { MoleculerClientError } = require("moleculer").Errors;
+// const CacheCleanerMixin = require("../mixins/cache.cleaner.mixin");
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 module.exports = {
@@ -122,19 +123,18 @@ module.exports = {
 
 					}
 					// console.log(mailpayload);
-					sgMail.send(mailpayload).then(res => {
-						console.log("Success sending unpaid =>")
-						// console.log(res)
-						//call action to clear trigger
-						let clear = ctx.call("project.clearAlert", { projects: entity });
-						return { status: "successs", mailpayload }
-					})
-						.catch(err => {
-							console.log("error")
-							let clear = ctx.call("project.clearAlert", { projects: entity });
-
-							console.log(err.response.body.errors)
-						})
+					// sgMail.send(mailpayload).then(res => {
+					// 	console.log("Success sending unpaid =>")
+					// 	// console.log(res)
+					// 	//call action to clear trigger
+					// 	let clear = ctx.call("project.clearAlert", { projects: entity });
+					// 	return { status: "successs", mailpayload }
+					// })
+					// 	.catch(err => {
+					// 		console.log("error")
+					// 		console.log(err.response.body.errors)
+					// 	})
+					let clear = ctx.call("project.clearAlert", { projects: entity });
 
 				}
 				catch (err) {
