@@ -134,6 +134,7 @@ module.exports = {
 					// 		console.log("error")
 					// 		console.log(err.response.body.errors)
 					// 	})
+					console.log("clearing alert temporarily");
 					let clear = ctx.call("project.clearAlert", { projects: entity });
 
 				}
