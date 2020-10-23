@@ -97,8 +97,6 @@ module.exports = {
 			},
 			async handler(ctx) {
 				let mailpayload = [];
-				console.log("entered unpaid alert")
-
 				try {
 					console.log("sending unpaid alert")
 
@@ -122,7 +120,6 @@ module.exports = {
 						mailpayload.push(msg);
 
 					}
-					// console.log(mailpayload);
 					// sgMail.send(mailpayload).then(res => {
 					// 	console.log("Success sending unpaid =>")
 					// 	// console.log(res)

@@ -389,10 +389,8 @@ module.exports = {
 			async handler(ctx) {
 				try {
 					let entity = ctx.params.projects;
-					console.log('clering alert')
 					for (let i = 0; i < entity.length; i++) {
 						let project = entity[i];
-						console.log({ payload: { _id: project.author._id } })
 						await ctx.call("users.resetStreak", { payload: { _id: project.author._id } });
 						let updated = await this.adapter.updateById(project._id, {
 							$set: {
