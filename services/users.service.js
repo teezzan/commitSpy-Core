@@ -353,7 +353,7 @@ module.exports = {
 			},
 			async handler(ctx) {
 				try {
-
+					let payload = ctx.params.payload;
 					let up_user = this.adapter.updateById(payload._id, { $set: { streak: 0 } });
 					return up_user
 				} catch (err) {
