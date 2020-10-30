@@ -60,6 +60,10 @@ module.exports = {
 						}
 
 					}
+					let clear = ctx.call("project.clearAlert", { projects: entity });
+					//call action to deduct money and move to another account where we then split and distribute accordingly
+					let deducted = ctx.call("payment.deductAlert", { projects: entity });
+					return { status: "successs" }
 
 				}
 				catch (err) {
@@ -88,7 +92,6 @@ module.exports = {
 
 					}
 					console.log("clearing alert temporarily");
-					//find alternative to sendgrid
 					let clear = ctx.call("project.clearAlert", { projects: entity });
 
 				}
