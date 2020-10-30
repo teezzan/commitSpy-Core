@@ -1,9 +1,17 @@
 "use strict";
 
 const { MoleculerClientError } = require("moleculer").Errors;
-// const CacheCleanerMixin = require("../mixins/cache.cleaner.mixin");
+var Twit = require('twit');
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+let T = new Twit({
+	access_token: process.env.ACCESS_TOKEN, //|| config.access_token,
+	access_token_secret: process.env.ACCESS_TOKEN_SECRET, //|| config.access_token_secret,
+	consumer_key: process.env.CONSUMER_KEY, //|| config.consumer_key,
+	consumer_secret: process.env.CONSUMER_SECRET //|| config.consumer_secret
+});
+
 module.exports = {
 	name: "notification",
 	mixins: [
@@ -16,10 +24,6 @@ module.exports = {
 	settings: {
 		/** REST Basepath */
 		rest: "/",
-
-		// /** Public fields */
-		// fields: ["_id", "title", "git_id", "setMinCommit", "maxTime", "author", "trigger", "alarmType", "weeklyCommits", "billing"],
-
 		/** Validator schema for entity */
 		entityValidator: {
 			author: { type: "object" },
@@ -50,38 +54,12 @@ module.exports = {
 					let entity = ctx.params.projects;
 					for (let i = 0; i < entity.length; i++) {
 						let project = entity[i];
-						if (project.alarmType == 1) {
-
-							// this.sendTwit({ handle: project.author.twitter, weekCommits: project.weekCommits, setMinCommit: project.setMinCommit });
-							//so-so and so will be glad for your donations in Tweets.
+						if (project.author.twitter) {
+							let tweet = await this.composeTweetPaid({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
+							let out = await this.postStatus(tweet);
 						}
-						//compose mail
-						let html = await this.composeMailPaid({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits, title: project.title })
-						let msg = {
-							to: `${project.author.email}`,
-							from: 'taiwo@skrypt.com.ng',
-							subject: 'You Just Missed Your Commit Goals.',
-							text: 'and a charity thanks you.',
-							html
-						};
-						mailpayload.push(msg);
 
 					}
-					// console.log(mailpayload);
-					sgMail.send(mailpayload)
-						.then(res => {
-							console.log("Success  sending Paid alert=>")
-							// console.log(res)
-							//call action to clear trigger
-							let clear = ctx.call("project.clearAlert", { projects: entity });
-							//call action to deduct money and move to another account where we then split and distribute accordingly
-							let deducted = ctx.call("payment.deductAlert", { projects: entity });
-							return { status: "successs", mailpayload }
-						})
-						.catch(err => {
-							console.log("error")
-							console.log(err.response.body.errors)
-						})
 
 				}
 				catch (err) {
@@ -103,34 +81,12 @@ module.exports = {
 					let entity = ctx.params.projects;
 					for (let i = 0; i < entity.length; i++) {
 						let project = entity[i];
-						if (project.alarmType == 1) {
-
-							// this.sendTwit({ handle: project.author.twitter, weekCommits: project.weekCommits, setMinCommit: project.setMinCommit });
-							//so-so and so will be glad for your donations in Tweets.
+						if (project.author.twitter) {
+							let tweet = await this.composeTweetUnPaid({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
+							let out = await this.postStatus(tweet);
 						}
-						//compose mail
-						let html = await this.composeMailUnPaid({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits, title: project.title })
-						let msg = {
-							to: `${project.author.email}`,
-							from: 'taiwo@skrypt.com.ng',
-							subject: 'You Just Missed Your Commit Goals.',
-							text: 'and you can do better.',
-							html
-						};
-						mailpayload.push(msg);
 
 					}
-					// sgMail.send(mailpayload).then(res => {
-					// 	console.log("Success sending unpaid =>")
-					// 	// console.log(res)
-					// 	//call action to clear trigger
-					// 	let clear = ctx.call("project.clearAlert", { projects: entity });
-					// 	return { status: "successs", mailpayload }
-					// })
-					// 	.catch(err => {
-					// 		console.log("error")
-					// 		console.log(err.response.body.errors)
-					// 	})
 					console.log("clearing alert temporarily");
 					//find alternative to sendgrid
 					let clear = ctx.call("project.clearAlert", { projects: entity });
@@ -153,31 +109,12 @@ module.exports = {
 					let entity = ctx.params.projects;
 					for (let i = 0; i < entity.length; i++) {
 						let project = entity[i];
-						if (project.alarmType == 1) {
-							// this.sendTwit({ handle: project.author.twitter, weekCommits: project.weekCommits, setMinCommit: project.setMinCommit });
+						if (project.author.twitter) {
+							let tweet = await this.composeTweetAlert({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
+							let out = await this.postStatus(tweet);
 						}
-						//compose mail
-						let html = await this.composeMail({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
-						let msg = {
-							to: `${project.author.email}`,
-							from: 'taiwo@skrypt.com.ng',
-							subject: 'Warning! Just A Little More To Go.',
-							text: 'and you will reach your goals',
-							html
-						};
-						mailpayload.push(msg);
 
 					}
-					// console.log(mailpayload);
-					sgMail.send(mailpayload).then(res => {
-						console.log("Success =>")
-						// console.log(res)
-						return { status: "successs", mailpayload }
-					})
-						.catch(err => {
-							console.log("error")
-							console.log(err.response.body.errors)
-						})
 
 				}
 				catch (err) {
@@ -217,21 +154,6 @@ module.exports = {
 				catch (err) {
 					console.log(err)
 					throw new MoleculerClientError("Scheduler Error!", 422, "", [{ field: "Failure", message: " dInternal Failure" }]);
-
-				}
-			}
-		},
-		sendTwit: {
-			params: {
-				payload: { type: "object" }
-			},
-			async handler(ctx) {
-				try {
-					console.log("sent twitt");
-				}
-				catch (err) {
-					console.log(err)
-					throw new MoleculerClientError("Notifier Error!", 422, "", [{ field: "Failure", message: " Internal Failure" }]);
 
 				}
 			}
@@ -293,6 +215,32 @@ module.exports = {
 					</p>`;
 			return mailbody
 		},
+		composeTweetAlert(payload) {
+
+			let mailbody = `  Hello ${payload.author.twitter}, you are ${payload.setMinCommit - payload.weekCommits} commits shy of your
+					${payload.setMinCommit} commit goal for repository ${payload.title}. Please endeavour to push your codes
+					 and write more if you haven't already. Happy Coding.
+					`;
+			return mailbody
+		},
+		composeTweetPaid(payload) {
+
+			let mailbody = ` Hello @${payload.author.twitter},
+					you are ${payload.setMinCommit - payload.weekCommits} commits shy of your
+					${payload.setMinCommit} commitS goal for repo ${payload.title} and have missed the deadline.
+					BTW, Thank You for your KIND Donation.
+					`;
+			return mailbody
+		},
+		composeTweetUnPaid(payload) {
+
+			let mailbody = ` Hello @${payload.author.twitter},
+					you are ${payload.setMinCommit - payload.weekCommits} commits shy of your
+					${payload.setMinCommit} commitS goal for repo ${payload.title} and have missed the deadline. 
+					You can do better. If you need more motivation, activate the billing option of the project.
+					`;
+			return mailbody
+		},
 		composeMailUnPaid(payload) {
 
 			let mailbody = ` <p> Hello ${payload.author.username},</p>
@@ -305,17 +253,6 @@ module.exports = {
 					<p>Taiwo
 					</p>`;
 			return mailbody
-		},
-		/**
-		 * Transform returned user entity as profile.
-		 *
-		 * @param {Context} ctx
-		 * @param {Object} user
-		 * @param {Object?} loggedInUser
-		 */
-		async transformProfile(ctx, project) {
-
-			return { project: project };
 		},
 		/**
 		 * Returns the week number for this date.  dowOffset is the day of week the week
@@ -357,6 +294,42 @@ module.exports = {
 			out.week = mydate.getWeek()
 			out.year = mydate.getFullYear()
 			return out;
+		},
+		postImage(filePath, status) {
+			T.postMediaChunked({ file_path: filePath, media_category: 'image/png' }, function (err, data, response) {
+				console.log(data)
+				var mediaIdStr = data.media_id_string
+				var altText = "commit Alert."
+				var meta_params = { media_id: mediaIdStr, alt_text: { text: altText } }
+				console.log('success 1');
+				setTimeout(() => {
+					T.post('media/metadata/create', meta_params, function (err, data, response) {
+						if (!err) {
+							// now we can reference the media and post a tweet (media will attach to the tweet)
+							var params = { status, media_ids: [mediaIdStr] }
+							console.log('success 2');
+							T.post('statuses/update', params, function (err, data, response) {
+								if (data.errors.length !== 0) {
+									console.log("retrying");
+								} else {
+									console.log("success 3")
+								}
+							})
+
+						} else {
+							console.log(err);
+						}
+					})
+				}, 2000);
+
+			})
+
+		},
+		async postStatus(status) {
+			T.post('statuses/update', { status }, function (err, data, response) {
+				console.log(data);
+				return true
+			})
 		}
 	}
 };
