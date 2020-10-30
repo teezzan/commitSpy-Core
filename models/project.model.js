@@ -33,7 +33,7 @@ let ProjectSchema = new Schema({
 	},
 	alarmType: {
 		type: Number,
-		"default": 0
+		"default": 1
 	},
 	billing: {
 		type: Boolean,

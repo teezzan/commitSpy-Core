@@ -40,7 +40,8 @@
     "moleculer-db-adapter-mongoose": "^0.8.7",
     "moleculer-web": "^0.9.0",
     "mongoose": "^5.10.0",
-    "nats": "^1.3.2"
+    "nats": "^1.3.2",
+    "twit": "^2.2.11"
   },
   "engines": {
     "node": ">= 10.x.x"
