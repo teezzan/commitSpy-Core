@@ -55,7 +55,7 @@ module.exports = {
 					for (let i = 0; i < entity.length; i++) {
 						let project = entity[i];
 						if (project.author.twitter) {
-							let tweet = await this.composeTweetPaid({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
+							let tweet = await this.composeTweetPaid({ author: project.author, title: project.title, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
 							let out = await this.postStatus(tweet);
 						}
 
@@ -86,7 +86,7 @@ module.exports = {
 					for (let i = 0; i < entity.length; i++) {
 						let project = entity[i];
 						if (project.author.twitter) {
-							let tweet = await this.composeTweetUnPaid({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
+							let tweet = await this.composeTweetUnPaid({ author: project.author, title: project.title, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
 							let out = await this.postStatus(tweet);
 						}
 
@@ -113,7 +113,7 @@ module.exports = {
 					for (let i = 0; i < entity.length; i++) {
 						let project = entity[i];
 						if (project.author.twitter) {
-							let tweet = await this.composeTweetAlert({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
+							let tweet = await this.composeTweetAlert({ author: project.author, title: project.title, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
 							let out = await this.postStatus(tweet);
 						}
 
