@@ -97,12 +97,13 @@ module.exports = {
 					let currency = ['USD', 'NGN', 'GHS']
 					const payment = ctx.params.payment;
 					if (payment.amount > 0 && currency.indexOf(payment.currency) >= 0) {
+
 						let payload = {
 							email: ctx.meta.user1.email,
 							amount: payment.amount,
-							reference: `${ctx.meta.user1._id}==${Date.now()}`,
+							reference: `${ctx.meta.user1._id}==${Date.now()}==${payment.coins}`,
 							currency: payment.currency,
-							callback_url: "localhost:3000/home"
+							callback_url: "commitspy.netlify.app/home"
 						}
 						let res = await axios.post('https://api.paystack.co/transaction/initialize', payload, {
 							headers: {
@@ -152,6 +153,7 @@ module.exports = {
 					if (ctx.meta.validation && event == 'charge.success') {
 						let reference = data.reference;
 						let id = reference.split('==')[0];
+						let coin = reference.split('==')[2];
 						let amount = data.amount / 100;
 						const account = await this.adapter.findOne({ name: 'Main' });
 						let updated = await this.adapter.updateById(account._id, {
@@ -170,7 +172,7 @@ module.exports = {
 							}
 						});
 
-						let user = await ctx.call("users.deductWallet", { payload: { _id: id, cost: amount } });
+						let user = await ctx.call("users.deductWallet", { payload: { _id: id, cost: coin } });
 						// console.log({ amount, id, user });
 						return { status: 200 };
 
