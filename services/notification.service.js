@@ -54,16 +54,30 @@ module.exports = {
 					let entity = ctx.params.projects;
 					for (let i = 0; i < entity.length; i++) {
 						let project = entity[i];
-						if (project.author.twitter) {
+						if (project.alarmType == 1 && project.author.twitter) {
 							let tweet = await this.composeTweetPaid({ author: project.author, title: project.title, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
 							let out = await this.postStatus(tweet);
 						}
+						else if (project.alarmType == 0) {
+							//compose mail
+							let html = await this.composeMailPaid({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
+							let msg = {
+								to: `${project.author.email}`,
+								from: 'noreply@commitspy.com',
+								subject: 'You Just Missed Your Commit Goals',
+								text: 'and a donation has been made on your behalf.',
+								html
+							};
+							await ctx.call("mail.send", msg)
+							mailpayload.push(msg);
+						}
+
 
 					}
 					let clear = ctx.call("project.clearAlert", { projects: entity });
 					//call action to deduct money and move to another account where we then split and distribute accordingly
 					let deducted = ctx.call("payment.deductAlert", { projects: entity });
-					return { status: "successs" }
+					return { status: "successs", mailpayload }
 
 				}
 				catch (err) {
@@ -85,9 +99,22 @@ module.exports = {
 					let entity = ctx.params.projects;
 					for (let i = 0; i < entity.length; i++) {
 						let project = entity[i];
-						if (project.author.twitter) {
+						if (project.alarmType == 1 && project.author.twitter) {
 							let tweet = await this.composeTweetUnPaid({ author: project.author, title: project.title, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
 							let out = await this.postStatus(tweet);
+						}
+						else if (project.alarmType == 0) {
+							//compose mail
+							let html = await this.composeMailUnPaid({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
+							let msg = {
+								to: `${project.author.email}`,
+								from: 'noreply@commitspy.com',
+								subject: 'You Just Missed Your Commit Goals',
+								text: 'do better.',
+								html
+							};
+							await ctx.call("mail.send", msg)
+							mailpayload.push(msg);
 						}
 
 					}
@@ -112,9 +139,22 @@ module.exports = {
 					let entity = ctx.params.projects;
 					for (let i = 0; i < entity.length; i++) {
 						let project = entity[i];
-						if (project.author.twitter) {
+						if (project.alarmType == 1 && project.author.twitter) {
 							let tweet = await this.composeTweetAlert({ author: project.author, title: project.title, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
 							let out = await this.postStatus(tweet);
+						}
+						else if (project.alarmType == 0) {
+							//compose mail
+							let html = await this.composeMail({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
+							let msg = {
+								to: `${project.author.email}`,
+								from: 'noreply@commitspy.com',
+								subject: 'Warning! Just A Little More To Go.',
+								text: 'and you will reach your goals',
+								html
+							};
+							await ctx.call("mail.send", msg)
+							mailpayload.push(msg);
 						}
 
 					}
@@ -139,19 +179,12 @@ module.exports = {
 					let html = await this.composePassMail({ username: entity.username, url: entity.url });
 					let msg = {
 						to: `${entity.email}`,
-						from: 'taiwo@skrypt.com.ng',
+						from: 'noreply@commitspy.com',
 						subject: 'Password Reset',
 						text: 'Confirmation.',
 						html
 					};
-					sgMail.send([msg]).then(res => {
-						console.log("Success =>");
-						return { status: "successs", msg }
-					})
-						.catch(err => {
-							console.log("error")
-							console.log(err.response.body.errors)
-						})
+					ctx.call("mail.send", msg).then(x => { return { status: "successs", msg } })
 
 				}
 				catch (err) {
