@@ -102,7 +102,7 @@ module.exports = {
 							email: ctx.meta.user1.email,
 							amount: payment.amount,
 							reference: `${ctx.meta.user1._id}==${Date.now()}==${payment.coins}`,
-							currency: payment.currency,
+							currency: 'USD',// payment.currency,
 							callback_url: "commitspy.netlify.app/home"
 						}
 						let res = await axios.post('https://api.paystack.co/transaction/initialize', payload, {
