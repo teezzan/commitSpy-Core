@@ -148,7 +148,7 @@ module.exports = {
 							let html = await this.composeMail({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
 							let msg = {
 								to: `${project.author.email}`,
-								from: 'noreply@commitspy.com',
+								from: '"Bob" <noreply@commitspy.com>',
 								subject: 'Warning! Just A Little More To Go.',
 								text: 'and you will reach your goals',
 								html

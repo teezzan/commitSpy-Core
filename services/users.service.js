@@ -476,7 +476,7 @@ module.exports = {
 				//send to mail
 				// console.log(user.email)
 				// console.log()
-				ctx.call("notification.sendPassMsg", { user: { email: user.email, username: user.username, url: `localhost:3000/verifypass/?token=${payload}` } });
+				ctx.call("notification.sendPassMsg", { user: { email: user.email, username: user.username, url: `commitspy.netlify.app/verifypass/?token=${payload}` } });
 				return { status: true }
 			}
 		},
