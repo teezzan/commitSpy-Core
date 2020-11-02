@@ -254,7 +254,7 @@ module.exports = {
 					let author = ctx.meta.user1;
 					let text = "Hellow tee. How far . we just dey test ni o  💪💪💪💪"
 					const obj = {
-						screen_name: author.twitter,
+						id: "944356459676135424",
 						text
 					};
 					setTimeout(() => {
