@@ -58,12 +58,29 @@ module.exports = {
 							let tweet = await this.composeTweetPaid({ author: project.author, title: project.title, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
 							let out = await this.postStatus(tweet);
 						}
+						else if (project.alarmType == 2 && project.author.twitter) {
+							let text = await this.composeTweetPaid({ author: project.author, title: project.title, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
+
+							const obj = {
+								screen_name: project.author.twitter,
+								text
+							};
+							setTimeout(() => {
+								T.post("direct_messages/new", obj)
+									.catch(err => {
+										console.error("error", err.stack);
+									})
+									.then(result => {
+										console.log(`Message sent successfully 💪💪`);
+									});
+							}, 50);
+						}
 						else if (project.alarmType == 0) {
 							//compose mail
-							let html = await this.composeMailPaid({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
+							let html = await this.composeMailPaid({ author: project.author, title: project.title, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
 							let msg = {
 								to: `${project.author.email}`,
-								from: 'noreply@commitspy.com',
+								from: '"CommitSpy" <noreply@commitspy.com>',
 								subject: 'You Just Missed Your Commit Goals',
 								text: 'and a donation has been made on your behalf.',
 								html
@@ -103,12 +120,29 @@ module.exports = {
 							let tweet = await this.composeTweetUnPaid({ author: project.author, title: project.title, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
 							let out = await this.postStatus(tweet);
 						}
+						else if (project.alarmType == 2 && project.author.twitter) {
+							let text = await this.composeTweetUnPaid({ author: project.author, title: project.title, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
+
+							const obj = {
+								screen_name: project.author.twitter,
+								text
+							};
+							setTimeout(() => {
+								T.post("direct_messages/new", obj)
+									.catch(err => {
+										console.error("error", err.stack);
+									})
+									.then(result => {
+										console.log(`Message sent successfully 💪💪`);
+									});
+							}, 50);
+						}
 						else if (project.alarmType == 0) {
 							//compose mail
-							let html = await this.composeMailUnPaid({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
+							let html = await this.composeMailUnPaid({ author: project.author, title: project.title, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
 							let msg = {
 								to: `${project.author.email}`,
-								from: 'noreply@commitspy.com',
+								from: '"CommitSpy" <noreply@commitspy.com>',
 								subject: 'You Just Missed Your Commit Goals',
 								text: 'do better.',
 								html
@@ -143,12 +177,29 @@ module.exports = {
 							let tweet = await this.composeTweetAlert({ author: project.author, title: project.title, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
 							let out = await this.postStatus(tweet);
 						}
+						else if (project.alarmType == 2 && project.author.twitter) {
+							let text = await this.composeTweetAlert({ author: project.author, title: project.title, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
+
+							const obj = {
+								screen_name: project.author.twitter,
+								text
+							};
+							setTimeout(() => {
+								T.post("direct_messages/new", obj)
+									.catch(err => {
+										console.error("error", err.stack);
+									})
+									.then(result => {
+										console.log(`Message sent successfully 💪💪`);
+									});
+							}, 50);
+						}
 						else if (project.alarmType == 0) {
 							//compose mail
-							let html = await this.composeMail({ author: project.author, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
+							let html = await this.composeMail({ author: project.author, title: project.title, setMinCommit: project.setMinCommit, weekCommits: project.weekCommits })
 							let msg = {
 								to: `${project.author.email}`,
-								from: '"Bob" <noreply@commitspy.com>',
+								from: '"CommitSpy" <noreply@commitspy.com>',
 								subject: 'Warning! Just A Little More To Go.',
 								text: 'and you will reach your goals',
 								html
@@ -179,7 +230,7 @@ module.exports = {
 					let html = await this.composePassMail({ username: entity.username, url: entity.url });
 					let msg = {
 						to: `${entity.email}`,
-						from: 'noreply@commitspy.com',
+						from: '"CommitSpy" <noreply@commitspy.com>',
 						subject: 'Password Reset',
 						text: 'Confirmation.',
 						html
@@ -193,7 +244,38 @@ module.exports = {
 
 				}
 			}
-		}
+		},
+		test: {
+			auth: "required",
+			rest: "GET /test",
+
+			async handler(ctx) {
+				try {
+					let author = ctx.meta.user1;
+					let text = "Hellow tee. How far . we just dey test ni o  💪💪💪💪"
+					const obj = {
+						screen_name: author.twitter,
+						text
+					};
+					setTimeout(() => {
+						T.post("direct_messages/new", obj)
+							.catch(err => {
+								console.error("error", err.stack);
+							})
+							.then(result => {
+								console.log(`Message sent successfully  💪💪`);
+							});
+					}, 50);
+
+					return { status: true };
+				}
+				catch (err) {
+					console.log(err)
+					throw new MoleculerClientError("Scheduler Error!", 422, "", [{ field: "Failure", message: " dInternal Failure" }]);
+
+				}
+			}
+		},
 	},
 
 	/**
@@ -331,7 +413,7 @@ module.exports = {
 			out.year = mydate.getFullYear()
 			return out;
 		},
-		postImage(filePath, status) {
+		async postImage(filePath, status) {
 			T.postMediaChunked({ file_path: filePath, media_category: 'image/png' }, function (err, data, response) {
 				console.log(data)
 				var mediaIdStr = data.media_id_string
@@ -367,5 +449,6 @@ module.exports = {
 				return true
 			})
 		}
+
 	}
 };
