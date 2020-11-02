@@ -97,7 +97,7 @@ module.exports = {
 					let currency = ['USD', 'NGN', 'GHS']
 					const payment = ctx.params.payment;
 					if (payment.amount > 0 && currency.indexOf(payment.currency) >= 0) {
-
+						//calculate number of coin
 						let payload = {
 							email: ctx.meta.user1.email,
 							amount: payment.amount,
@@ -188,6 +188,20 @@ module.exports = {
 				catch (err) {
 					console.log(err)
 					return { status: 200 };
+
+				}
+			}
+		},
+		rate: {
+			rest: "GET /rate",
+
+			async handler(ctx) {
+				try {
+					return { USD: 368 }
+				}
+				catch (err) {
+					console.log(err)
+					throw new MoleculerClientError("Scheduler Error!", 422, "", [{ field: "Failure", message: " dInternal Failure" }]);
 
 				}
 			}

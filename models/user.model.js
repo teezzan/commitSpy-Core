@@ -47,7 +47,7 @@ let UserSchema = new Schema({
 	},
 	wallet: {
 		type: Number,
-		"default": 0.00
+		"default": 20
 	},
 	streak: {
 		type: Number,
