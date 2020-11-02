@@ -258,7 +258,7 @@ module.exports = {
 						text
 					};
 					setTimeout(() => {
-						T.post("direct_messages/new", obj)
+						T.post("direct_messages/events/new", obj)
 							.catch(err => {
 								console.error("error", err.stack);
 							})
