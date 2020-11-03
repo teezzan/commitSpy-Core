@@ -421,9 +421,6 @@ module.exports = {
 					})
 					let data2 = res2.data;
 					let email = data2[data2.findIndex(x => x.primary == true && x.verified == true)].email;
-
-					// console.log("data2 ", data2);
-
 					let user = {
 						email: email,
 						git_id: `${data.id}`,
