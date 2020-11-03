@@ -443,6 +443,7 @@ module.exports = {
 					else {
 						a = await ctx.call("users.loginGithub", { git_id: user.git_id });
 						a = { ...a, state: "login" };
+						//update the twitter handle and gravater.
 
 					}
 
