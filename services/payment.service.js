@@ -107,7 +107,7 @@ module.exports = {
 
 						let payload = {
 							email: ctx.meta.user1.email,
-							amount: amount * rate.USD,
+							amount: amount * rate.USD * 100,
 							reference: `${ctx.meta.user1._id}==${Date.now()}==${payment.coins}`,
 							currency: 'NGN',
 							callback_url: "commitspy.netlify.app/home"
