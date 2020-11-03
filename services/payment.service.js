@@ -94,15 +94,22 @@ module.exports = {
 			async handler(ctx) {
 
 				try {
-					let currency = ['USD', 'NGN', 'GHS']
+					let currency = ['USD', 'NGN', 'GHS'];
+					//calculate amount of coins
+					//10 for $5
+					//50 for $20
+					//100 for $80
+					let cost = { 10: 5, 50: 20, 100: 80 };
 					const payment = ctx.params.payment;
-					if (payment.amount > 0 && currency.indexOf(payment.currency) >= 0) {
-						//calculate number of coin
+					let amount = cost[payment.coins];
+					let rate = await ctx.call('payment.rate');
+					if (payment.coins > 0 && amount != undefined) {
+
 						let payload = {
 							email: ctx.meta.user1.email,
-							amount: payment.amount,
+							amount: amount * rate.USD,
 							reference: `${ctx.meta.user1._id}==${Date.now()}==${payment.coins}`,
-							currency: payment.currency,
+							currency: 'NGN',
 							callback_url: "commitspy.netlify.app/home"
 						}
 						let res = await axios.post('https://api.paystack.co/transaction/initialize', payload, {
