@@ -194,7 +194,7 @@ module.exports = {
 				}
 				catch (err) {
 					console.log(err)
-					return { status: 200 };
+					throw new MoleculerClientError("Payment Error!", 500, "", [{ field: "Failure", message: " Internal Failure" }]);
 
 				}
 			}

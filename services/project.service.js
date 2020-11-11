@@ -140,6 +140,7 @@ module.exports = {
 					throw new MoleculerClientError("UnAuthorized", 422, "", [{ field: "Auth", message: "failed" }]);
 
 				if (repo) {
+					console.log("old data = ", newData);
 
 					if (newData.title) {
 						const found = await this.adapter.findOne({ title: newData.title });
@@ -177,6 +178,7 @@ module.exports = {
 						newData.trigger = repo.trigger
 					}
 
+					console.log("new data = ", newData);
 					const update = {
 						"$set": newData
 					};

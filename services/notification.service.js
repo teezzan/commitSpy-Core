@@ -354,8 +354,7 @@ module.exports = {
 
 			let mailbody = ` Hello @${payload.author.twitter},
 					you are ${payload.setMinCommit - payload.weekCommits} commits shy of your
-					${payload.setMinCommit} commitS goal for repo ${payload.title} and have missed the deadline. 
-					You can do better. If you need more motivation, activate the billing option of the project.
+					${payload.setMinCommit} commitS goal for repo ${payload.title} and have missed the deadline.
 					`;
 			return mailbody
 		},
