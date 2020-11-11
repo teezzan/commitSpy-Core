@@ -172,7 +172,7 @@ module.exports = {
 						throw new MoleculerClientError("Error!", 422, "", [{ field: "UnAuthorized", message: " UnAuthorized changes" }]);
 
 					}
-					if (newData.maxTime !== repo.maxTime) {
+					if (newData.maxTime && newData.maxTime !== repo.maxTime) {
 						newData.trigger = Date.now() + newData.maxTime;
 					} else {
 						newData.trigger = repo.trigger
