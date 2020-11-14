@@ -153,11 +153,11 @@ module.exports = {
 					if (newData.alarmType && newData.alarmType > 2) {
 						newData.alarmType = 0
 					}
-					if (newData.maxTime && newData.maxTime < 0) {
+					if (newData.maxTime && newData.maxTime <= 0) {
 						throw new MoleculerClientError("Error!", 422, "", [{ field: "maxTime", message: " should be positive" }]);
 
 					}
-					if (newData.setMinCommit && newData.setMinCommit < 0) {
+					if (newData.setMinCommit && newData.setMinCommit <= 0) {
 						throw new MoleculerClientError("Error!", 422, "", [{ field: "setMinCommit", message: " should be positive" }]);
 
 					}
